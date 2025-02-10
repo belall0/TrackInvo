@@ -1,14 +1,14 @@
 import Image from 'next/image';
+import { fetchLatestInvoices, fetchCardData } from '@/lib/data';
+
 import clsx from 'clsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 import { LatestInvoice } from '@/lib/definitions';
 
-const LatestInvoices = ({
-  latestInvoices,
-}: {
-  latestInvoices: LatestInvoice[];
-}) => {
+const LatestInvoices = async () => {
+  const latestInvoices: LatestInvoice[] = await fetchLatestInvoices();
+
   return (
     <div className="flex w-full flex-col md:col-span-4">
       <h2 className={`mb-4 text-xl font-semibold md:text-2xl`}>

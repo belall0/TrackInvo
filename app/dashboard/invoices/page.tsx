@@ -1,4 +1,4 @@
-const Invoices = () => {
+const Invoices = async () => {
   return <div>Invoices Page</div>;
 };
 

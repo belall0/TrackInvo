@@ -1,12 +1,15 @@
 import Card from '@/components/dashboard/Card';
+import { fetchLatestInvoices, fetchCardData } from '@/lib/data';
 import {} from '@/lib/definitions';
 
-const CardList = ({
-  totalPaidInvoices,
-  totalPendingInvoices,
-  numberOfInvoices,
-  numberOfCustomers,
-}: any) => {
+const CardList = async () => {
+  const {
+    numberOfCustomers,
+    numberOfInvoices,
+    totalPaidInvoices,
+    totalPendingInvoices,
+  } = await fetchCardData();
+
   return (
     <>
       <Card title="Collected" value={totalPaidInvoices} type="collected" />
