@@ -3,7 +3,11 @@
 import Link from 'next/link';
 import clsx from 'clsx';
 import { usePathname } from 'next/navigation';
-import { UserGroupIcon, HomeIcon, DocumentDuplicateIcon } from '@heroicons/react/24/outline';
+import {
+  UserGroupIcon,
+  HomeIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/24/outline';
 
 const links = [
   { name: 'Home', href: '/dashboard', icon: HomeIcon },
@@ -32,8 +36,9 @@ const NavLinks = () => {
                 'bg-sky-100 text-blue-600': pathname === link.href,
               },
             )}
-            key={link.name}>
-            <IconName className="w-6 " />
+            key={link.name}
+          >
+            <IconName className="w-6" />
             <p className="hidden md:block">{link.name}</p>
           </Link>
         );

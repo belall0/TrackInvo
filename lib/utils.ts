@@ -7,7 +7,10 @@ export const formatCurrency = (amount: number) => {
   });
 };
 
-export const formatDateToLocal = (dateStr: string, locale: string = 'en-US') => {
+export const formatDateToLocal = (
+  dateStr: string,
+  locale: string = 'en-US',
+) => {
   const date = new Date(dateStr);
 
   const options: Intl.DateTimeFormatOptions = {
@@ -15,12 +18,13 @@ export const formatDateToLocal = (dateStr: string, locale: string = 'en-US') => 
     month: 'short',
     year: 'numeric',
   };
-
   const formatter = new Intl.DateTimeFormat(locale, options);
   return formatter.format(date);
 };
 
 export const generateYAxis = (revenue: Revenue[]) => {
+  // Calculate what labels we need to display on the y-axis
+  // based on highest record and in 1000s
   const yAxisLabels = [];
   const highestRecord = Math.max(...revenue.map((month) => month.revenue));
   const topLabel = Math.ceil(highestRecord / 1000) * 1000;
@@ -54,5 +58,13 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
   // If the current page is somewhere in the middle,
   // show the first page, an ellipsis, the current page and its neighbors,
   // another ellipsis, and the last page.
-  return [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+  return [
+    1,
+    '...',
+    currentPage - 1,
+    currentPage,
+    currentPage + 1,
+    '...',
+    totalPages,
+  ];
 };

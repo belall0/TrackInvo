@@ -3,11 +3,36 @@ import postgres from 'postgres';
 import * as definitions from '@/lib/definitions';
 import { formatCurrency } from '@/lib/utils';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const sql = postgres(process.env.DATABASE_URL!, { ssl: 'require' });
 
 const fetchRevenue = async () => {
+  // Map month names to their numerical values
+  const monthMap = {
+    Jan: 1,
+    Feb: 2,
+    Mar: 3,
+    Apr: 4,
+    May: 5,
+    Jun: 6,
+    Jul: 7,
+    Aug: 8,
+    Sep: 9,
+    Oct: 10,
+    Nov: 11,
+    Dec: 12,
+  };
+
   try {
-    return await sql<definitions.Revenue[]>`SELECT * FROM revenue`;
+    const data = await sql<definitions.Revenue[]>`SELECT * FROM revenue`;
+
+    // Sort the data based on the numerical values of the months
+    data.sort(
+      (a, b): number =>
+        monthMap[a.month as keyof typeof monthMap] -
+        monthMap[b.month as keyof typeof monthMap],
+    );
+
+    return data;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch revenue data.');
@@ -46,7 +71,11 @@ const fetchCardData = async () => {
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
 
-    const data = await Promise.all([invoiceCountPromise, customerCountPromise, invoiceStatusPromise]);
+    const data = await Promise.all([
+      invoiceCountPromise,
+      customerCountPromise,
+      invoiceStatusPromise,
+    ]);
 
     const numberOfInvoices = Number(data[0][0].count ?? '0');
     const numberOfCustomers = Number(data[1][0].count ?? '0');
