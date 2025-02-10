@@ -5,7 +5,7 @@ import { inter } from '@/lib/fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Financial Dashboard',
+  title: 'Invo',
   description: 'A financial dashboard built with Next.js and Tailwind CSS.',
 };
 
