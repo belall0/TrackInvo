@@ -4,6 +4,9 @@ import Search from '@/components/search';
 import Table from '@/components/invoices/table';
 import { CreateInvoice } from '@/components/invoices/buttons';
 import { InvoicesTableSkeleton } from '@/components/Skeletons';
+import Pagination from '@/components/invoices/pagination';
+
+import { fetchInvoicesPages } from '@/lib/data';
 
 const Invoices = async (prob: {
   searchParams: Promise<{
@@ -14,6 +17,7 @@ const Invoices = async (prob: {
   const searchParams = await prob.searchParams;
   const query = searchParams.query || '';
   const currentPage = searchParams.page ? parseInt(searchParams.page) : 1;
+  const totalPages = await fetchInvoicesPages(query);
 
   return (
     <div className="w-full">
@@ -31,7 +35,7 @@ const Invoices = async (prob: {
       </Suspense>
 
       <div className="mt-5 flex w-full justify-center">
-        {/* <Pagination totalPages={totalPages} /> */}
+        <Pagination totalPages={totalPages} />
       </div>
     </div>
   );
