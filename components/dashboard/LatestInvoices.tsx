@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { fetchLatestInvoices, fetchCardData } from '@/lib/data';
+import { fetchLatestInvoices } from '@/lib/data';
 
 import clsx from 'clsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';

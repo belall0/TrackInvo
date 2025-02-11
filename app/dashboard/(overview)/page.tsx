@@ -6,7 +6,7 @@ import {
   LatestInvoicesSkeleton,
   RevenueChartSkeleton,
   CardsSkeleton,
-} from '@/components/dashboard/Skeletons';
+} from '@/components/Skeletons';
 
 const DashBoard = async () => {
   return (
