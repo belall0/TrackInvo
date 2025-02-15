@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { deleteForm } from '@/lib/actions';
 
 const CreateInvoice = () => {
   return (
@@ -16,7 +17,7 @@ const CreateInvoice = () => {
 const UpdateInvoice = ({ id }: { id: string }) => {
   return (
     <Link
-      href="/dashboard/invoices"
+      href={`/dashboard/invoices/${id}/edit`}
       className="rounded-md border p-2 hover:bg-gray-100"
     >
       <PencilIcon className="w-5" />
@@ -25,13 +26,15 @@ const UpdateInvoice = ({ id }: { id: string }) => {
 };
 
 const DeleteInvoice = ({ id }: { id: string }) => {
+  const deleteFormWithId = deleteForm.bind(null, id);
+
   return (
-    <>
+    <form action={deleteFormWithId}>
       <button type="submit" className="rounded-md border p-2 hover:bg-gray-100">
         <span className="sr-only">Delete</span>
         <TrashIcon className="w-5" />
       </button>
-    </>
+    </form>
   );
 };
 
