@@ -27,9 +27,7 @@ const fetchRevenue = async () => {
 
     // Sort the data based on the numerical values of the months
     data.sort(
-      (a, b): number =>
-        monthMap[a.month as keyof typeof monthMap] -
-        monthMap[b.month as keyof typeof monthMap],
+      (a, b): number => monthMap[a.month as keyof typeof monthMap] - monthMap[b.month as keyof typeof monthMap],
     );
 
     return data;
@@ -71,11 +69,7 @@ const fetchCardData = async () => {
          SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END) AS "pending"
          FROM invoices`;
 
-    const data = await Promise.all([
-      invoiceCountPromise,
-      customerCountPromise,
-      invoiceStatusPromise,
-    ]);
+    const data = await Promise.all([invoiceCountPromise, customerCountPromise, invoiceStatusPromise]);
 
     const numberOfInvoices = Number(data[0][0].count ?? '0');
     const numberOfCustomers = Number(data[1][0].count ?? '0');
