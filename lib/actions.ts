@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import postgres from 'postgres';
 import { z } from 'zod';
-import { loginSchema, LoginValues } from '@/lib/schema';
+import { loginSchema, LoginValues, SignupValues } from '@/lib/schema';
 import { createResponse } from '@/lib/utils';
 
 interface Response<T = any> {
@@ -13,7 +13,8 @@ interface Response<T = any> {
   data?: T;
 }
 
-export const LoginAction = async (prevState: any, data: FormData | LoginValues) => {
+export const loginAction = async (prevState: any, data: FormData | LoginValues) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   let validatedFields;
 
   if (data instanceof FormData) {
@@ -35,6 +36,33 @@ export const LoginAction = async (prevState: any, data: FormData | LoginValues) 
   return createResponse({
     success: true,
     message: 'Login Successful',
+  });
+};
+
+export const signupAction = async (prevState: any, data: FormData | SignupValues) => {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+
+  let validatedFields;
+  if (data instanceof FormData) {
+    validatedFields = loginSchema.safeParse({
+      name: data.get('name'),
+      email: data.get('email'),
+      password: data.get('password'),
+    });
+  } else {
+    validatedFields = loginSchema.safeParse(data);
+  }
+
+  if (!validatedFields.success) {
+    return createResponse({
+      success: false,
+      message: 'Missing Fields. Failed to Signup.',
+    });
+  }
+
+  return createResponse({
+    success: true,
+    message: 'Signup Successful',
   });
 };
 

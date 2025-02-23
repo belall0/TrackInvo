@@ -37,7 +37,7 @@ const AuthFormWrapper = ({ children, formTitle, formDescription, formType }: Aut
           <div className="flex items-center justify-center gap-2">
             <span className="text-muted-foreground"> Already have an account?</span>
             <Link href="/auth/login">
-              <span className="text-blue-600">Sign up</span>
+              <span className="text-blue-600">Log In</span>
             </Link>
           </div>
         )}

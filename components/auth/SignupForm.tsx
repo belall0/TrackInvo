@@ -1,22 +1,22 @@
 'use client';
 
 import { useActionState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginValues } from '@/lib/schema';
-import { loginAction } from '@/lib/actions';
+import { useForm } from 'react-hook-form';
+import { signupSchema, SignupValues } from '@/lib/schema';
+import { signupAction } from '@/lib/actions';
 
 // UI Components
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper';
-import FormError from '@/components/FormError';
 import FormSuccess from '@/components/FormSuccess';
+import FormError from '@/components/FormError';
 
 // Type Definitions for form fields
 interface FormFieldConfig {
-  name: keyof LoginValues;
+  name: keyof SignupValues;
   label: string;
   type: string;
   placeholder: string;
@@ -25,37 +25,50 @@ interface FormFieldConfig {
 // Form Fields
 const formFields: FormFieldConfig[] = [
   {
+    name: 'name',
+    label: 'Name',
+    type: 'text',
+    placeholder: 'Belal Muhammad',
+  },
+  {
     name: 'email',
     label: 'Email',
     type: 'email',
     placeholder: 'belal@example.com',
   },
-
   {
     name: 'password',
     label: 'Password',
     type: 'password',
     placeholder: '********',
   },
+  {
+    name: 'confirmPassword',
+    label: 'Confirm Password',
+    type: 'password',
+    placeholder: '********',
+  },
 ];
 
-const LoginForm = () => {
+const SignupForm = () => {
   // 1. useActionState hook to get the response from the loginAction
-  const [data, action] = useActionState(loginAction, undefined);
+  const [data, action] = useActionState(signupAction, undefined);
   // 2. useTransition hook to handle the pending state of the form
   const [isPending, startTransition] = useTransition();
 
   // 3. useForm hook to handle the form state
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<SignupValues>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
+      confirmPassword: '',
     },
   });
 
   // 4. onSubmit to handle the form validation using zod and call the action
-  function onSubmit(values: LoginValues) {
+  function onSubmit(values: SignupValues) {
     // 4.1 startTransition to set the pending state
     startTransition(() => {
       action(values);
@@ -63,7 +76,7 @@ const LoginForm = () => {
   }
 
   // 5. renderFormField to render the form fields based on the formFields array without repeating the code
-  const renderFormField = ({ name, label, type, placeholder }: FormFieldConfig, key: string) => (
+  const renderFormFields = ({ name, type, label, placeholder }: FormFieldConfig, key: string) => (
     <FormField
       key={key}
       control={form.control}
@@ -72,7 +85,7 @@ const LoginForm = () => {
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input type={type} placeholder={placeholder} {...field} disabled={isPending} />
+            <Input placeholder={placeholder} {...field} type={type} disabled={isPending} />
           </FormControl>
           <FormMessage />
         </FormItem>
@@ -90,16 +103,16 @@ const LoginForm = () => {
 
   return (
     <AuthFormWrapper
-      formTitle="Log In to Your Account"
-      formDescription="Enter your credentials to access your account."
-      formType="login">
+      formTitle="Create Your Account"
+      formDescription="Sign up to get started. It’s quick and secure."
+      formType="signup">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {formFields.map((field) => renderFormField(field, field.name))}
+          {formFields.map((field) => renderFormFields(field, field.name))}
           {renderFormStatus()}
 
-          <Button type="submit" className="w-full">
-            Log In
+          <Button type="submit" className="w-full" disabled={isPending}>
+            Submit
           </Button>
         </form>
       </Form>
@@ -107,4 +120,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default SignupForm;
