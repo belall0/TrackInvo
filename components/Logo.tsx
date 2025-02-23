@@ -1,10 +1,12 @@
-import { GlobeAltIcon } from '@heroicons/react/24/outline';
+import { LuHandCoins } from 'react-icons/lu';
 
-const Logo = () => (
-  <div className={`flex flex-row items-center leading-none text-white`}>
-    <GlobeAltIcon className="h-12 w-12 rotate-[15deg]" />
-    <p className="text-[44px]">Invo</p>
-  </div>
-);
+const Logo = () => {
+  return (
+    <div className="flex items-center">
+      <LuHandCoins className="mr-4 h-12 w-12 rotate-[15deg]" />
+      <p className="text-5xl font-bold">Invo</p>
+    </div>
+  );
+};
 
 export default Logo;

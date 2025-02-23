@@ -6,6 +6,13 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export const createResponse = <T = any>(options: { success: boolean; message?: string; data?: T }): Response<T> => {
+  return {
+    success: options.success,
+    message: options.message,
+    data: options.data,
+  };
+};
 export const formatCurrency = (amount: number) => {
   return (amount / 100).toLocaleString('en-US', {
     style: 'currency',

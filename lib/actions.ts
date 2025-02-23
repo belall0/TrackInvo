@@ -1,9 +1,42 @@
 'use server';
 
-import { z } from 'zod';
-import postgres from 'postgres';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import postgres from 'postgres';
+import { z } from 'zod';
+import { loginSchema, LoginValues } from '@/lib/schema';
+import { createResponse } from '@/lib/utils';
+
+interface Response<T = any> {
+  success: boolean;
+  message?: string;
+  data?: T;
+}
+
+export const LoginAction = async (prevState: any, data: FormData | LoginValues) => {
+  let validatedFields;
+
+  if (data instanceof FormData) {
+    validatedFields = loginSchema.safeParse({
+      email: data.get('email'),
+      password: data.get('password'),
+    });
+  } else {
+    validatedFields = loginSchema.safeParse(data);
+  }
+
+  if (!validatedFields.success) {
+    return createResponse({
+      success: false,
+      message: 'Missing Fields. Failed to Login.',
+    });
+  }
+
+  return createResponse({
+    success: true,
+    message: 'Login Successful',
+  });
+};
 
 export type State = {
   errors?: {
