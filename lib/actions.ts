@@ -3,15 +3,66 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import postgres from 'postgres';
+import bcrypt from 'bcryptjs';
 import { z } from 'zod';
-import { loginSchema, LoginValues, SignupValues } from '@/lib/schema';
+import { loginSchema, LoginValues, SignupValues, signupSchema } from '@/lib/schema';
 import { createResponse } from '@/lib/utils';
+import { createUser, getUserByEmail } from '@/lib/data/user';
 
 interface Response<T = any> {
   success: boolean;
   message?: string;
   data?: T;
 }
+
+export const signupAction = async (prevState: any, data: FormData | SignupValues) => {
+  // 1. Validate the form data
+  let validatedFields;
+  if (data instanceof FormData) {
+    validatedFields = signupSchema.safeParse({
+      name: data.get('name'),
+      email: data.get('email'),
+      password: data.get('password'),
+    });
+  } else {
+    validatedFields = signupSchema.safeParse(data);
+  }
+
+  if (!validatedFields.success) {
+    return createResponse({
+      success: false,
+      message: 'Invalid fields. Please check your input.',
+    });
+  }
+
+  // 2. check if the user already exists
+  const { email } = validatedFields.data;
+  const user = await getUserByEmail(email);
+  if (user) {
+    return createResponse({
+      success: false,
+      message: 'An account with this email already exists',
+    });
+  }
+
+  // 3. Hash the password
+  const { name, password } = validatedFields.data;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // 4. Create the user
+  try {
+    await createUser({ name, email, password: hashedPassword });
+    return createResponse({
+      success: true,
+      message: 'Account created successfully',
+    });
+  } catch (error) {
+    return createResponse({
+      success: false,
+      message: 'An unexpected error occurred during signup, please try again',
+    });
+  }
+};
 
 export const loginAction = async (prevState: any, data: FormData | LoginValues) => {
   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -36,33 +87,6 @@ export const loginAction = async (prevState: any, data: FormData | LoginValues) 
   return createResponse({
     success: true,
     message: 'Login Successful',
-  });
-};
-
-export const signupAction = async (prevState: any, data: FormData | SignupValues) => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  let validatedFields;
-  if (data instanceof FormData) {
-    validatedFields = loginSchema.safeParse({
-      name: data.get('name'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  } else {
-    validatedFields = loginSchema.safeParse(data);
-  }
-
-  if (!validatedFields.success) {
-    return createResponse({
-      success: false,
-      message: 'Missing Fields. Failed to Signup.',
-    });
-  }
-
-  return createResponse({
-    success: true,
-    message: 'Signup Successful',
   });
 };
 
