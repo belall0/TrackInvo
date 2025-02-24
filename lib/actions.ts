@@ -7,7 +7,10 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { loginSchema, LoginValues, SignupValues, signupSchema } from '@/lib/schema';
 import { createResponse } from '@/lib/utils';
-import { createUser, getUserByEmail } from '@/lib/data/user';
+import { createUser, getUserByEmail } from '@/data/user';
+
+import { signIn } from '@/auth/auth';
+import { DEFAULT_LOGIN_REDIRECT } from '@/auth/routes';
 
 interface Response<T = any> {
   success: boolean;
@@ -56,6 +59,8 @@ export const signupAction = async (prevState: any, data: FormData | SignupValues
       success: true,
       message: 'Account created successfully',
     });
+
+    // redirect to the login page
   } catch (error) {
     return createResponse({
       success: false,
@@ -65,9 +70,8 @@ export const signupAction = async (prevState: any, data: FormData | SignupValues
 };
 
 export const loginAction = async (prevState: any, data: FormData | LoginValues) => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
+  // 1. Validate the form data
   let validatedFields;
-
   if (data instanceof FormData) {
     validatedFields = loginSchema.safeParse({
       email: data.get('email'),
@@ -80,13 +84,34 @@ export const loginAction = async (prevState: any, data: FormData | LoginValues) 
   if (!validatedFields.success) {
     return createResponse({
       success: false,
-      message: 'Missing Fields. Failed to Login.',
+      message: 'Invalid fields. Please check your input.',
     });
   }
 
-  return createResponse({
-    success: true,
-    message: 'Login Successful',
+  // 2. Check if the user exists
+  const { email, password } = validatedFields.data;
+  const user = await getUserByEmail(email);
+  if (!user) {
+    return createResponse({
+      success: false,
+      message: 'Invalid email or password',
+    });
+  }
+
+  // 3. Compare the password
+  const passwordMatch = await bcrypt.compare(password, user.password!);
+  if (!passwordMatch) {
+    return createResponse({
+      success: false,
+      message: 'Invalid email or password',
+    });
+  }
+
+  // 4. Sign the user in
+  await signIn('credentials', {
+    email,
+    password,
+    redirectTo: DEFAULT_LOGIN_REDIRECT, // redirect to the home page if the user is authenticated
   });
 };
 
