@@ -1,6 +1,6 @@
 import db from '@/data/db';
-import { Prisma, InvoiceStatus } from '@prisma/client';
-import { users, customers, invoices } from '@/data/placeholder-data';
+import { Prisma } from '@prisma/client';
+import { users, customers, invoices, revenues } from '@/data/placeholder-data';
 
 const seedUsers = async (users: Prisma.UserCreateManyInput[]) => {
   await db.user.createMany({ data: users });
@@ -18,10 +18,17 @@ const seedInvoices = async (invoices: Prisma.InvoiceCreateManyInput[]) => {
   });
 };
 
+const seedRevenues = async (revenues: Prisma.RevenueCreateManyInput[]) => {
+  await db.revenue.createMany({
+    data: revenues,
+  });
+};
+
 const clearData = async () => {
   await db.user.deleteMany();
   await db.customer.deleteMany();
   await db.invoice.deleteMany();
+  await db.revenue.deleteMany();
 };
 
 const seed = async () => {
@@ -30,6 +37,7 @@ const seed = async () => {
   await seedUsers(users);
   await seedCustomers(customers);
   await seedInvoices(invoices);
+  await seedRevenues(revenues);
 };
 
 seed();

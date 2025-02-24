@@ -8,29 +8,33 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(cuid())
-  name         String     @db.VarChar(255)
-  email        String     @unique @db.VarChar(255)
-  passwordHash String     @map("password_hash") @db.VarChar(255)
-  image        String?    @db.VarChar(255)
-  createdAt    DateTime   @default(now()) @map("created_at")
-  updatedAt    DateTime   @updatedAt @map("updated_at")
-  customers    Customer[]
-  invoices     Invoice[]
+  id           String   @id @default(cuid())
+  name         String   @db.VarChar(255)
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  image        String?  @db.VarChar(255)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  customers Customer[]
+  invoices  Invoice[]
+  Revenue   Revenue[]
 
   @@map("users")
 }
 
 model Customer {
-  id        String    @id @default(cuid())
-  userId    String    @map("user_id")
-  name      String    @db.VarChar(255)
-  phone     String?   @db.VarChar(50)
-  image     String?   @db.VarChar(255)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  invoices  Invoice[]
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  name      String   @db.VarChar(255)
+  email     String?  @db.VarChar(255)
+  phone     String?  @db.VarChar(50)
+  image     String?  @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices Invoice[]
 
   @@map("customers")
 }
@@ -50,6 +54,24 @@ model Invoice {
   @@index([customerId])
   @@index([status])
   @@map("invoices")
+}
+
+model Revenue {
+  id      String @id @default(cuid())
+  userId  String @map("user_id")
+  month   Int // 1-12 representing month
+  year    Int // e.g., 2025
+  revenue Int
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, month, year])
+  @@index([userId])
+  @@index([year, month])
+  @@map("revenues")
 }
 
 enum InvoiceStatus {

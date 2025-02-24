@@ -25,12 +25,12 @@ export default {
         });
 
         // if there's no user or there's a user but uses OAuth
-        if (!user || !user.password) {
+        if (!user || !user.passwordHash) {
           return null;
         }
 
         // check if the password is correct
-        const isMatchedPassword = await bcrypt.compare(password, user.password);
+        const isMatchedPassword = await bcrypt.compare(password, user.passwordHash);
         if (!isMatchedPassword) {
           return null;
         }

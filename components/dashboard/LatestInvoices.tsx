@@ -1,19 +1,17 @@
 import Image from 'next/image';
-import { fetchLatestInvoices } from '@/lib/data';
+import { fetchLatestInvoicesByUserId } from '@/data/data';
 
 import clsx from 'clsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
 
 import { LatestInvoice } from '@/lib/definitions';
 
-const LatestInvoices = async () => {
-  const latestInvoices: LatestInvoice[] = await fetchLatestInvoices();
+const LatestInvoices = async ({ userId }: { userId?: string }) => {
+  const latestInvoices = await fetchLatestInvoicesByUserId(userId!);
 
   return (
     <div className="flex w-full flex-col md:col-span-4">
-      <h2 className={`mb-4 text-xl font-semibold md:text-2xl`}>
-        Latest Invoices
-      </h2>
+      <h2 className={`mb-4 text-xl font-semibold md:text-2xl`}>Latest Invoices</h2>
 
       <div className="flex grow flex-col justify-between rounded-xl bg-gray-50 p-4">
         <div className="bg-white px-6">
@@ -21,36 +19,26 @@ const LatestInvoices = async () => {
             return (
               <div
                 key={invoice.id}
-                className={clsx(
-                  'flex flex-row items-center justify-between py-4',
-                  {
-                    'border-t': i !== 0,
-                  },
-                )}
-              >
+                className={clsx('flex flex-row items-center justify-between py-4', {
+                  'border-t': i !== 0,
+                })}>
                 <div className="flex items-center">
                   <Image
-                    src={invoice.image_url}
-                    alt={`${invoice.name}'s profile picture`}
+                    src={invoice.customer.image!}
+                    alt={`${invoice.customer.name!}'s profile picture`}
                     className="mr-4 rounded-full"
                     width={32}
                     height={32}
                   />
 
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold md:text-base">
-                      {invoice.name}
-                    </p>
+                    <p className="truncate text-sm font-semibold md:text-base">{invoice.customer.name}</p>
 
-                    <p className="hidden text-sm text-gray-500 sm:block">
-                      {invoice.email}
-                    </p>
+                    <p className="hidden text-sm text-gray-500 sm:block">{invoice.customer.email}</p>
                   </div>
                 </div>
 
-                <p className={`truncate text-sm font-medium md:text-base`}>
-                  {invoice.amount}
-                </p>
+                <p className={`truncate text-sm font-medium md:text-base`}>{invoice.amount}</p>
               </div>
             );
           })}
