@@ -785,4 +785,152 @@ const revenues = [
   },
 ];
 
-export { users, customers, invoices, revenues };
+type cTableType = {
+  id: string;
+  name: string;
+  email: string;
+  image_url: string;
+  total_invoices: number;
+  total_pending: number;
+  total_paid: number;
+};
+
+const cTable: cTableType[] = [
+  {
+    id: customers[0].id,
+    name: customers[0].name,
+    email: customers[0].email,
+    image_url: customers[0].image,
+    total_invoices: 2,
+    total_pending: 1,
+    total_paid: 1,
+  },
+  {
+    id: customers[1].id,
+    name: customers[1].name,
+    email: customers[1].email,
+    image_url: customers[1].image,
+    total_invoices: 2,
+    total_pending: 0,
+    total_paid: 2,
+  },
+  {
+    id: customers[2].id,
+    name: customers[2].name,
+    email: customers[2].email,
+    image_url: customers[2].image,
+    total_invoices: 2,
+    total_pending: 1,
+    total_paid: 1,
+  },
+  {
+    id: customers[3].id,
+    name: customers[3].name,
+    email: customers[3].email,
+    image_url: customers[3].image,
+    total_invoices: 2,
+    total_pending: 0,
+    total_paid: 2,
+  },
+  {
+    id: customers[4].id,
+    name: customers[4].name,
+    email: customers[4].email,
+    image_url: customers[4].image,
+    total_invoices: 2,
+    total_pending: 0,
+    total_paid: 2,
+  },
+  {
+    id: customers[5].id,
+    name: customers[5].name,
+    email: customers[5].email,
+    image_url: customers[5].image,
+    total_invoices: 2,
+    total_pending: 1,
+    total_paid: 1,
+  },
+  {
+    id: customers[6].id,
+    name: customers[6].name,
+    email: customers[6].email,
+    image_url: customers[6].image,
+    total_invoices: 2,
+    total_pending: 2,
+    total_paid: 0,
+  },
+  {
+    id: customers[7].id,
+    name: customers[7].name,
+    email: customers[7].email,
+    image_url: customers[7].image,
+    total_invoices: 2,
+    total_pending: 1,
+    total_paid: 1,
+  },
+  {
+    id: customers[8].id,
+    name: customers[8].name,
+    email: customers[8].email,
+    image_url: customers[8].image,
+    total_invoices: 2,
+    total_pending: 2,
+    total_paid: 0,
+  },
+  {
+    id: customers[9].id,
+    name: customers[9].name,
+    email: customers[9].email,
+    image_url: customers[9].image,
+    total_invoices: 2,
+    total_pending: 2,
+    total_paid: 0,
+  },
+  {
+    id: customers[10].id,
+    name: customers[10].name,
+    email: customers[10].email,
+    image_url: customers[10].image,
+    total_invoices: 2,
+    total_pending: 1,
+    total_paid: 1,
+  },
+  {
+    id: customers[11].id,
+    name: customers[11].name,
+    email: customers[11].email,
+    image_url: customers[11].image,
+    total_invoices: 2,
+    total_pending: 2,
+    total_paid: 0,
+  },
+  {
+    id: customers[12].id,
+    name: customers[12].name,
+    email: customers[12].email,
+    image_url: customers[12].image,
+    total_invoices: 2,
+    total_pending: 0,
+    total_paid: 2,
+  },
+  {
+    id: customers[13].id,
+    name: customers[13].name,
+    email: customers[13].email,
+    image_url: customers[13].image,
+    total_invoices: 2,
+    total_pending: 0,
+    total_paid: 2,
+  },
+  {
+    id: customers[14].id,
+    name: customers[14].name,
+    email: customers[14].email,
+    image_url: customers[14].image,
+    total_invoices: 1,
+    total_pending: 0,
+    total_paid: 1,
+  },
+];
+
+export { users, customers, invoices, revenues, cTable };
