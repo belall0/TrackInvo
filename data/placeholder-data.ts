@@ -1,8 +1,140 @@
 import cuid from 'cuid';
-import { InvoiceStatus } from '@prisma/client';
+import { User, Customer, Revenue, InvoiceStatus } from '@/lib/types';
 
-// DONE:
-const users = [
+// Helper function to get a random item from an array
+const getRandomItem = (array: any) => array[Math.floor(Math.random() * array.length)];
+
+// Helper function to get a random date between two dates
+const getRandomDate = (start: Date, end: Date) => {
+  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+};
+
+// Function to generate customers
+const generateCustomers = (users: User[], count = 15) => {
+  const maleNames = [
+    'Ahmed Hassan',
+    'Mohamed Ali',
+    'Mahmoud Salah',
+    'Omar Ibrahim',
+    'Youssef Farid',
+    'Karim Abdel',
+    'Tarek Mohamed',
+    'Amir Samir',
+    'Hany Khalil',
+    'Samy Rashad',
+    'Khaled Mahmoud',
+    'Waleed Nasser',
+    'Adel Fawzy',
+    'Bassem Taha',
+    'Sherif Gamal',
+    'Hazem Osman',
+    'Ramy Essam',
+    'Fadi Magdy',
+    'Ziad Hamdi',
+    'Nasr El-Din',
+  ];
+  const femaleNames = [
+    'Fatima Ahmed',
+    'Aya Mohamed',
+    'Mariam Hassan',
+    'Yasmin Ali',
+    'Nour Ibrahim',
+    'Salma Farid',
+    'Laila Abdel',
+    'Rania Samir',
+    'Dina Khalil',
+    'Mona Rashad',
+    'Hana Mahmoud',
+    'Amira Nasser',
+    'Shereen Fawzy',
+    'Nadia Taha',
+    'Reem Gamal',
+    'Samar Osman',
+    'Layla Essam',
+    'Rasha Magdy',
+    'Heba Hamdi',
+    'Zeinab El-Din',
+  ];
+
+  const startDate = new Date('2024-01-01');
+  const endDate = new Date('2025-01-25');
+
+  return Array.from({ length: count }, (_, i) => {
+    const isFemale = i % 2 === 1;
+    const name = isFemale ? getRandomItem(femaleNames) : getRandomItem(maleNames);
+    const firstName = name.split(' ')[0].toLowerCase();
+    const lastName = name.split(' ')[1].toLowerCase();
+
+    const createdAt = getRandomDate(startDate, endDate);
+    const updatedAt = new Date(createdAt.getTime() + Math.random() * (2 * 24 * 60 * 60 * 1000)); // 0-2 days later
+
+    return {
+      id: cuid(),
+      userId: users[i % users.length].id,
+      name,
+      email: `${firstName}.${lastName}@example.com`,
+      phone: `+2012345678${i < 10 ? '0' + i : i}`,
+      image: `/avatars/${isFemale ? 'female' : 'male'}${(i % 5) + 1}.png`,
+      createdAt,
+      updatedAt,
+    };
+  });
+};
+
+// Function to generate invoices
+const generateInvoices = (users: User[], customers: Customer[], count = 30) => {
+  const startDate = new Date('2024-08-01');
+  const endDate = new Date('2024-12-20');
+
+  return Array.from({ length: count }, (_, i) => {
+    const createdAt = getRandomDate(startDate, endDate);
+    const customer = getRandomItem(customers);
+
+    return {
+      id: cuid(),
+      userId: customer.userId,
+      customerId: customer.id,
+      amount: Math.round(75 + Math.random() * 375) + (Math.random() > 0.5 ? 0 : 0.99),
+      status: Math.random() > 0.5 ? InvoiceStatus.paid : InvoiceStatus.pending,
+      createdAt,
+      updatedAt: createdAt,
+    };
+  });
+};
+
+// Function to generate revenues
+const generateRevenues = (users: User[]) => {
+  const revenues: Revenue[] = [];
+
+  users.forEach((user) => {
+    for (let month = 1; month <= 12; month++) {
+      // Early months have higher revenue (pattern from original data)
+      let baseRevenue = month <= 7 ? 2000 - month * 50 : 550 - month * 25;
+      if (baseRevenue < 0) baseRevenue = 200;
+
+      // Add some randomness
+      const revenue = Math.round(baseRevenue * (0.8 + Math.random() * 0.4));
+
+      // Calculate the next month for createdAt date (January of next year for December)
+      const nextMonth = month < 12 ? month + 1 : 1;
+      const year = month < 12 ? 2024 : 2025;
+
+      revenues.push({
+        id: cuid(),
+        userId: user.id,
+        month,
+        year: 2024,
+        revenue,
+        createdAt: new Date(`${year}-${String(nextMonth).padStart(2, '0')}-01T10:00:00Z`),
+        updatedAt: new Date(`${year}-${String(nextMonth).padStart(2, '0')}-01T10:00:00Z`),
+      });
+    }
+  });
+
+  return revenues;
+};
+
+const users: User[] = [
   {
     id: cuid(),
     name: 'Belal Muhammad',
@@ -12,7 +144,6 @@ const users = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-
   {
     id: cuid(),
     name: 'Ahmed Mahmoud',
@@ -22,7 +153,6 @@ const users = [
     createdAt: new Date(),
     updatedAt: new Date(),
   },
-
   {
     id: cuid(),
     name: 'Rahma Ahmed',
@@ -34,903 +164,8 @@ const users = [
   },
 ];
 
-const customers = [
-  {
-    id: cuid(),
-    userId: users[0].id,
-    name: 'Ahmed Mostafa',
-    email: 'ahmed.mostafa@example.com',
-    phone: '+201234567890',
-    image: '/avatars/male1.png',
-    createdAt: new Date('2024-10-15'),
-    updatedAt: new Date('2024-10-15'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    name: 'Mohamed Ali',
-    email: 'mohamed.ali@example.com',
-    phone: '+201234567891',
-    image: '/avatars/male2.png',
-    createdAt: new Date('2024-11-02'),
-    updatedAt: new Date('2024-11-03'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    name: 'Youssef Ibrahim',
-    email: 'youssef.ibrahim@example.com',
-    phone: '+201234567892',
-    image: '/avatars/male3.png',
-    createdAt: new Date('2024-12-05'),
-    updatedAt: new Date('2024-12-07'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    name: 'Nour Hassan',
-    email: 'nour.hassan@example.com',
-    phone: '+201234567893',
-    image: '/avatars/female1.png',
-    createdAt: new Date('2025-01-10'),
-    updatedAt: new Date('2025-01-15'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    name: 'Mariam Adel',
-    email: 'mariam.adel@example.com',
-    phone: '+201234567894',
-    image: '/avatars/female2.png',
-    createdAt: new Date('2025-01-20'),
-    updatedAt: new Date('2025-01-22'),
-  },
+const customers = generateCustomers(users, 20);
+const invoices = generateInvoices(users, customers, 500);
+const revenues = generateRevenues(users);
 
-  {
-    id: cuid(),
-    userId: users[1].id,
-    name: 'Omar Khaled',
-    email: 'omar.khaled@example.com',
-    phone: '+201234567895',
-    image: '/avatars/male4.png',
-    createdAt: new Date('2024-09-12'),
-    updatedAt: new Date('2024-10-01'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    name: 'Karim Nasser',
-    email: 'karim.nasser@example.com',
-    phone: '+201234567896',
-    image: '/avatars/male5.png',
-    createdAt: new Date('2024-10-22'),
-    updatedAt: new Date('2024-11-05'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    name: 'Layla Ahmed',
-    email: 'layla.ahmed@example.com',
-    phone: '+201234567897',
-    image: '/avatars/female3.png',
-    createdAt: new Date('2024-11-15'),
-    updatedAt: new Date('2024-11-20'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    name: 'Amira Mahmoud',
-    email: 'amira.mahmoud@example.com',
-    phone: '+201234567898',
-    image: '/avatars/female4.png',
-    createdAt: new Date('2024-12-10'),
-    updatedAt: new Date('2024-12-15'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    name: 'Dina Waleed',
-    email: 'dina.waleed@example.com',
-    phone: '+201234567899',
-    image: '/avatars/female5.png',
-    createdAt: new Date('2025-01-05'),
-    updatedAt: new Date('2025-01-10'),
-  },
-
-  {
-    id: cuid(),
-    userId: users[2].id,
-    name: 'Mostafa Gamal',
-    email: 'mostafa.gamal@example.com',
-    phone: '+201234567900',
-    image: '/avatars/male1.png',
-    createdAt: new Date('2024-08-15'),
-    updatedAt: new Date('2024-09-01'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    name: 'Ibrahim Fawzy',
-    email: 'ibrahim.fawzy@example.com',
-    phone: '+201234567901',
-    image: '/avatars/male2.png',
-    createdAt: new Date('2024-09-20'),
-    updatedAt: new Date('2024-10-01'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    name: 'Amr Sameh',
-    email: 'amr.sameh@example.com',
-    phone: '+201234567902',
-    image: '/avatars/male3.png',
-    createdAt: new Date('2024-10-25'),
-    updatedAt: new Date('2024-11-01'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    name: 'Fatima Mohamed',
-    email: 'fatima.mohamed@example.com',
-    phone: '+201234567903',
-    image: '/avatars/female1.png',
-    createdAt: new Date('2024-11-15'),
-    updatedAt: new Date('2024-11-20'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    name: 'Yasmin Tarek',
-    email: 'yasmin.tarek@example.com',
-    phone: '+201234567904',
-    image: '/avatars/female2.png',
-    createdAt: new Date('2024-12-10'),
-    updatedAt: new Date('2024-12-15'),
-  },
-];
-
-const invoices = [
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[3].id,
-    amount: 125.5,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-12-15T10:30:00Z'),
-    updatedAt: new Date('2024-12-15T10:30:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[8].id,
-    amount: 89.99,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-12-10T14:45:00Z'),
-    updatedAt: new Date('2024-12-10T14:45:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[12].id,
-    amount: 245.75,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-12-05T09:15:00Z'),
-    updatedAt: new Date('2024-12-05T09:15:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[5].id,
-    amount: 325.0,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-12-01T16:20:00Z'),
-    updatedAt: new Date('2024-12-01T16:20:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[10].id,
-    amount: 75.25,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-11-28T11:10:00Z'),
-    updatedAt: new Date('2024-11-28T11:10:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[2].id,
-    amount: 199.99,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-11-25T13:40:00Z'),
-    updatedAt: new Date('2024-11-25T13:40:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[7].id,
-    amount: 149.5,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-11-20T08:25:00Z'),
-    updatedAt: new Date('2024-11-20T08:25:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[14].id,
-    amount: 99.0,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-11-15T15:55:00Z'),
-    updatedAt: new Date('2024-11-15T15:55:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[0].id,
-    amount: 275.25,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-11-10T10:05:00Z'),
-    updatedAt: new Date('2024-11-10T10:05:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[9].id,
-    amount: 450.75,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-11-05T14:35:00Z'),
-    updatedAt: new Date('2024-11-05T14:35:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[4].id,
-    amount: 175.5,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-11-01T09:50:00Z'),
-    updatedAt: new Date('2024-11-01T09:50:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[11].id,
-    amount: 299.99,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-10-28T16:15:00Z'),
-    updatedAt: new Date('2024-10-28T16:15:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[1].id,
-    amount: 125.25,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-10-25T11:40:00Z'),
-    updatedAt: new Date('2024-10-25T11:40:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[6].id,
-    amount: 85.0,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-10-20T13:25:00Z'),
-    updatedAt: new Date('2024-10-20T13:25:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[13].id,
-    amount: 375.5,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-10-15T08:10:00Z'),
-    updatedAt: new Date('2024-10-15T08:10:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[0].id,
-    amount: 215.75,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-10-10T15:30:00Z'),
-    updatedAt: new Date('2024-10-10T15:30:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[5].id,
-    amount: 149.99,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-10-05T10:45:00Z'),
-    updatedAt: new Date('2024-10-05T10:45:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[10].id,
-    amount: 95.25,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-10-01T14:20:00Z'),
-    updatedAt: new Date('2024-10-01T14:20:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[3].id,
-    amount: 350.0,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-09-28T09:35:00Z'),
-    updatedAt: new Date('2024-09-28T09:35:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[8].id,
-    amount: 185.5,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-09-25T16:50:00Z'),
-    updatedAt: new Date('2024-09-25T16:50:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[12].id,
-    amount: 225.75,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-09-20T11:15:00Z'),
-    updatedAt: new Date('2024-09-20T11:15:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[7].id,
-    amount: 79.99,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-09-15T13:40:00Z'),
-    updatedAt: new Date('2024-09-15T13:40:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[2].id,
-    amount: 295.25,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-09-10T08:05:00Z'),
-    updatedAt: new Date('2024-09-10T08:05:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[9].id,
-    amount: 175.0,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-09-05T15:30:00Z'),
-    updatedAt: new Date('2024-09-05T15:30:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[4].id,
-    amount: 399.99,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-09-01T10:55:00Z'),
-    updatedAt: new Date('2024-09-01T10:55:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[11].id,
-    amount: 115.5,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-08-28T14:20:00Z'),
-    updatedAt: new Date('2024-08-28T14:20:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    customerId: customers[1].id,
-    amount: 250.25,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-08-25T09:45:00Z'),
-    updatedAt: new Date('2024-08-25T09:45:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    customerId: customers[6].id,
-    amount: 129.0,
-    status: InvoiceStatus.pending,
-    createdAt: new Date('2024-08-20T16:10:00Z'),
-    updatedAt: new Date('2024-08-20T16:10:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    customerId: customers[13].id,
-    amount: 425.75,
-    status: InvoiceStatus.paid,
-    createdAt: new Date('2024-08-15T11:35:00Z'),
-    updatedAt: new Date('2024-08-15T11:35:00Z'),
-  },
-];
-
-const revenues = [
-  // User 1 (Belal Muhammad) - Jan to Dec 2024
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 1,
-    year: 2024,
-    revenue: 1250,
-    createdAt: new Date('2024-02-01T10:00:00Z'),
-    updatedAt: new Date('2024-02-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 2,
-    year: 2024,
-    revenue: 1425,
-    createdAt: new Date('2024-03-01T10:00:00Z'),
-    updatedAt: new Date('2024-03-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 3,
-    year: 2024,
-    revenue: 1650,
-    createdAt: new Date('2024-04-01T10:00:00Z'),
-    updatedAt: new Date('2024-04-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 4,
-    year: 2024,
-    revenue: 1875,
-    createdAt: new Date('2024-05-01T10:00:00Z'),
-    updatedAt: new Date('2024-05-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 5,
-    year: 2024,
-    revenue: 2100,
-    createdAt: new Date('2024-06-01T10:00:00Z'),
-    updatedAt: new Date('2024-06-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 6,
-    year: 2024,
-    revenue: 1950,
-    createdAt: new Date('2024-07-01T10:00:00Z'),
-    updatedAt: new Date('2024-07-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 7,
-    year: 2024,
-    revenue: 1775,
-    createdAt: new Date('2024-08-01T10:00:00Z'),
-    updatedAt: new Date('2024-08-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 8,
-    year: 2024,
-    revenue: 529,
-    createdAt: new Date('2024-09-01T10:00:00Z'),
-    updatedAt: new Date('2024-09-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 9,
-    year: 2024,
-    revenue: 430,
-    createdAt: new Date('2024-10-01T10:00:00Z'),
-    updatedAt: new Date('2024-10-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 10,
-    year: 2024,
-    revenue: 341,
-    createdAt: new Date('2024-11-01T10:00:00Z'),
-    updatedAt: new Date('2024-11-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 11,
-    year: 2024,
-    revenue: 600,
-    createdAt: new Date('2024-12-01T10:00:00Z'),
-    updatedAt: new Date('2024-12-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[0].id,
-    month: 12,
-    year: 2024,
-    revenue: 450,
-    createdAt: new Date('2025-01-01T10:00:00Z'),
-    updatedAt: new Date('2025-01-01T10:00:00Z'),
-  },
-
-  // User 2 (Ahmed Mahmoud) - Jan to Dec 2024
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 1,
-    year: 2024,
-    revenue: 975,
-    createdAt: new Date('2024-02-01T10:00:00Z'),
-    updatedAt: new Date('2024-02-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 2,
-    year: 2024,
-    revenue: 1150,
-    createdAt: new Date('2024-03-01T10:00:00Z'),
-    updatedAt: new Date('2024-03-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 3,
-    year: 2024,
-    revenue: 1325,
-    createdAt: new Date('2024-04-01T10:00:00Z'),
-    updatedAt: new Date('2024-04-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 4,
-    year: 2024,
-    revenue: 1575,
-    createdAt: new Date('2024-05-01T10:00:00Z'),
-    updatedAt: new Date('2024-05-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 5,
-    year: 2024,
-    revenue: 1725,
-    createdAt: new Date('2024-06-01T10:00:00Z'),
-    updatedAt: new Date('2024-06-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 6,
-    year: 2024,
-    revenue: 1850,
-    createdAt: new Date('2024-07-01T10:00:00Z'),
-    updatedAt: new Date('2024-07-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 7,
-    year: 2024,
-    revenue: 1650,
-    createdAt: new Date('2024-08-01T10:00:00Z'),
-    updatedAt: new Date('2024-08-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 8,
-    year: 2024,
-    revenue: 541,
-    createdAt: new Date('2024-09-01T10:00:00Z'),
-    updatedAt: new Date('2024-09-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 9,
-    year: 2024,
-    revenue: 481,
-    createdAt: new Date('2024-10-01T10:00:00Z'),
-    updatedAt: new Date('2024-10-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 10,
-    year: 2024,
-    revenue: 235,
-    createdAt: new Date('2024-11-01T10:00:00Z'),
-    updatedAt: new Date('2024-11-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 11,
-    year: 2024,
-    revenue: 351,
-    createdAt: new Date('2024-12-01T10:00:00Z'),
-    updatedAt: new Date('2024-12-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[1].id,
-    month: 12,
-    year: 2024,
-    revenue: 90,
-    createdAt: new Date('2025-01-01T10:00:00Z'),
-    updatedAt: new Date('2025-01-01T10:00:00Z'),
-  },
-
-  // User 3 (Rahma Ahmed) - Jan to Dec 2024
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 1,
-    year: 2024,
-    revenue: 1100,
-    createdAt: new Date('2024-02-01T10:00:00Z'),
-    updatedAt: new Date('2024-02-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 2,
-    year: 2024,
-    revenue: 1250,
-    createdAt: new Date('2024-03-01T10:00:00Z'),
-    updatedAt: new Date('2024-03-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 3,
-    year: 2024,
-    revenue: 1475,
-    createdAt: new Date('2024-04-01T10:00:00Z'),
-    updatedAt: new Date('2024-04-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 4,
-    year: 2024,
-    revenue: 1625,
-    createdAt: new Date('2024-05-01T10:00:00Z'),
-    updatedAt: new Date('2024-05-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 5,
-    year: 2024,
-    revenue: 1800,
-    createdAt: new Date('2024-06-01T10:00:00Z'),
-    updatedAt: new Date('2024-06-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 6,
-    year: 2024,
-    revenue: 1725,
-    createdAt: new Date('2024-07-01T10:00:00Z'),
-    updatedAt: new Date('2024-07-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 7,
-    year: 2024,
-    revenue: 1550,
-    createdAt: new Date('2024-08-01T10:00:00Z'),
-    updatedAt: new Date('2024-08-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 8,
-    year: 2024,
-    revenue: 250,
-    createdAt: new Date('2024-09-01T10:00:00Z'),
-    updatedAt: new Date('2024-09-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 9,
-    year: 2024,
-    revenue: 401,
-    createdAt: new Date('2024-10-01T10:00:00Z'),
-    updatedAt: new Date('2024-10-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 10,
-    year: 2024,
-    revenue: 471,
-    createdAt: new Date('2024-11-01T10:00:00Z'),
-    updatedAt: new Date('2024-11-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 11,
-    year: 2024,
-    revenue: 200,
-    createdAt: new Date('2024-12-01T10:00:00Z'),
-    updatedAt: new Date('2024-12-01T10:00:00Z'),
-  },
-  {
-    id: cuid(),
-    userId: users[2].id,
-    month: 12,
-    year: 2024,
-    revenue: 246,
-    createdAt: new Date('2025-01-01T10:00:00Z'),
-    updatedAt: new Date('2025-01-01T10:00:00Z'),
-  },
-];
-
-type cTableType = {
-  id: string;
-  name: string;
-  email: string;
-  image_url: string;
-  total_invoices: number;
-  total_pending: number;
-  total_paid: number;
-};
-
-const cTable: cTableType[] = [
-  {
-    id: customers[0].id,
-    name: customers[0].name,
-    email: customers[0].email,
-    image_url: customers[0].image,
-    total_invoices: 2,
-    total_pending: 1,
-    total_paid: 1,
-  },
-  {
-    id: customers[1].id,
-    name: customers[1].name,
-    email: customers[1].email,
-    image_url: customers[1].image,
-    total_invoices: 2,
-    total_pending: 0,
-    total_paid: 2,
-  },
-  {
-    id: customers[2].id,
-    name: customers[2].name,
-    email: customers[2].email,
-    image_url: customers[2].image,
-    total_invoices: 2,
-    total_pending: 1,
-    total_paid: 1,
-  },
-  {
-    id: customers[3].id,
-    name: customers[3].name,
-    email: customers[3].email,
-    image_url: customers[3].image,
-    total_invoices: 2,
-    total_pending: 0,
-    total_paid: 2,
-  },
-  {
-    id: customers[4].id,
-    name: customers[4].name,
-    email: customers[4].email,
-    image_url: customers[4].image,
-    total_invoices: 2,
-    total_pending: 0,
-    total_paid: 2,
-  },
-  {
-    id: customers[5].id,
-    name: customers[5].name,
-    email: customers[5].email,
-    image_url: customers[5].image,
-    total_invoices: 2,
-    total_pending: 1,
-    total_paid: 1,
-  },
-  {
-    id: customers[6].id,
-    name: customers[6].name,
-    email: customers[6].email,
-    image_url: customers[6].image,
-    total_invoices: 2,
-    total_pending: 2,
-    total_paid: 0,
-  },
-  {
-    id: customers[7].id,
-    name: customers[7].name,
-    email: customers[7].email,
-    image_url: customers[7].image,
-    total_invoices: 2,
-    total_pending: 1,
-    total_paid: 1,
-  },
-  {
-    id: customers[8].id,
-    name: customers[8].name,
-    email: customers[8].email,
-    image_url: customers[8].image,
-    total_invoices: 2,
-    total_pending: 2,
-    total_paid: 0,
-  },
-  {
-    id: customers[9].id,
-    name: customers[9].name,
-    email: customers[9].email,
-    image_url: customers[9].image,
-    total_invoices: 2,
-    total_pending: 2,
-    total_paid: 0,
-  },
-  {
-    id: customers[10].id,
-    name: customers[10].name,
-    email: customers[10].email,
-    image_url: customers[10].image,
-    total_invoices: 2,
-    total_pending: 1,
-    total_paid: 1,
-  },
-  {
-    id: customers[11].id,
-    name: customers[11].name,
-    email: customers[11].email,
-    image_url: customers[11].image,
-    total_invoices: 2,
-    total_pending: 2,
-    total_paid: 0,
-  },
-  {
-    id: customers[12].id,
-    name: customers[12].name,
-    email: customers[12].email,
-    image_url: customers[12].image,
-    total_invoices: 2,
-    total_pending: 0,
-    total_paid: 2,
-  },
-  {
-    id: customers[13].id,
-    name: customers[13].name,
-    email: customers[13].email,
-    image_url: customers[13].image,
-    total_invoices: 2,
-    total_pending: 0,
-    total_paid: 2,
-  },
-  {
-    id: customers[14].id,
-    name: customers[14].name,
-    email: customers[14].email,
-    image_url: customers[14].image,
-    total_invoices: 1,
-    total_pending: 0,
-    total_paid: 1,
-  },
-];
-
-export { users, customers, invoices, revenues, cTable };
+export { users, customers, invoices, revenues };

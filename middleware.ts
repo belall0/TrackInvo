@@ -11,22 +11,24 @@ export default auth((req) => {
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
+  const isHomePage = nextUrl.pathname === '/';
 
-  if (isAuthRoute) {
-    return; // don't do anything
-  }
-
-  // if logged in trying to access auth route, redirect to DEFAULT_LOGIN_REDIRECT
-  if (isLoggedIn && isApiAuthRoute) {
-    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl.origin));
-  }
-
-  // if not logged in and trying to access auth route, allow it
+  // if it's an auth api route defined in the routes.ts, allow it
   if (isApiAuthRoute) {
     return;
   }
 
-  // if not logged in and trying to access non-public route, redirect to login
+  // if logged in trying to access the home page, login or signup, redirect to dashboard
+  if (isLoggedIn && (isAuthRoute || isHomePage)) {
+    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl.origin));
+  }
+
+  // if not logged in and trying to access auth route, allow it
+  if (isAuthRoute) {
+    return;
+  }
+
+  // // if not logged in and trying to access non-public route, redirect to login
   if (!isLoggedIn && !isPublicRoute) {
     return Response.redirect(new URL('/auth/login', nextUrl.origin));
   }
