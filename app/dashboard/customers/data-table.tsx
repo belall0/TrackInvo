@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
           <Input
             placeholder="Search Customers..."
             value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value)}
+            onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value.trim())}
             className="mr-4 h-10 w-full border border-gray-200 pl-10"
           />
 

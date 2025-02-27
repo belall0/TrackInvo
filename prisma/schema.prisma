@@ -27,7 +27,7 @@ model Customer {
   id        String   @id @default(cuid())
   userId    String   @map("user_id")
   name      String   @db.VarChar(255)
-  email     String?  @db.VarChar(255)
+  email     String   @db.VarChar(255)
   phone     String?  @db.VarChar(50)
   image     String?  @db.VarChar(255)
   createdAt DateTime @default(now()) @map("created_at")
@@ -36,6 +36,7 @@ model Customer {
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   invoices Invoice[]
 
+  @@unique([userId, email]) // A user can have only one customer with a given email
   @@map("customers")
 }
 

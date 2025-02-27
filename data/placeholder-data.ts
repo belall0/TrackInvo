@@ -1,108 +1,117 @@
 import cuid from 'cuid';
-import { User, Customer, Revenue, InvoiceStatus } from '@/lib/types';
+import { User, Customer, Revenue, InvoiceStatus, Invoice } from '@/lib/types';
+import { Decimal } from '@prisma/client/runtime/library';
 
-// Helper function to get a random item from an array
-const getRandomItem = (array: any) => array[Math.floor(Math.random() * array.length)];
+const maleNames = [
+  'Mohamed',
+  'Ahmed',
+  'Mahmoud',
+  'Ali',
+  'Omar',
+  'Mostafa',
+  'Khaled',
+  'Youssef',
+  'Ibrahim',
+  'Amr',
+  'Karim',
+  'Hassan',
+  'Hussein',
+  'Tamer',
+  'Sherif',
+  'Hossam',
+  'Ayman',
+  'Essam',
+  'Waleed',
+  'Ashraf',
+  'Hamza',
+  'Tarek',
+  'Adel',
+  'Ramy',
+];
 
-// Helper function to get a random date between two dates
-const getRandomDate = (start: Date, end: Date) => {
-  return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+const femaleNames = [
+  'Nour',
+  'Fatma',
+  'Aisha',
+  'Mariam',
+  'Sara',
+  'Heba',
+  'Aya',
+  'Amira',
+  'Salma',
+  'Laila',
+  'Dina',
+  'Yasmin',
+  'Rania',
+  'Maha',
+  'Eman',
+  'Noha',
+  'Hana',
+  'Esraa',
+  'Mona',
+  'Hala',
+  'Basma',
+  'Nada',
+  'Ghada',
+  'Reem',
+];
+
+const surnames = [
+  'Ibrahim',
+  'Mohamed',
+  'Ahmed',
+  'Mahmoud',
+  'Ali',
+  'Hassan',
+  'Hussein',
+  'El-Sayed',
+  'Abdelrahman',
+  'Mostafa',
+  'Kamal',
+  'Fawzy',
+  'Sayed',
+  'Salah',
+  'Magdy',
+  'Nasser',
+  'Samir',
+  'Adel',
+  'Youssef',
+  'Ramadan',
+  'Farouk',
+  'Shafik',
+];
+
+const generateRandomName = (gender: 'male' | 'female') => {
+  // 1. Select a random first name based on the gender
+  const firstNames = gender === 'male' ? maleNames : femaleNames;
+
+  // 2. Construct a random full name
+  const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const randomSurname = surnames[Math.floor(Math.random() * surnames.length)];
+
+  // 3. Return the full name
+  return `${randomFirstName} ${randomSurname}`;
 };
 
-// Function to generate customers
-const generateCustomers = (users: User[], count = 15) => {
-  const maleNames = [
-    'Ahmed Hassan',
-    'Mohamed Ali',
-    'Mahmoud Salah',
-    'Omar Ibrahim',
-    'Youssef Farid',
-    'Karim Abdel',
-    'Tarek Mohamed',
-    'Amir Samir',
-    'Hany Khalil',
-    'Samy Rashad',
-    'Khaled Mahmoud',
-    'Waleed Nasser',
-    'Adel Fawzy',
-    'Bassem Taha',
-    'Sherif Gamal',
-    'Hazem Osman',
-    'Ramy Essam',
-    'Fadi Magdy',
-    'Ziad Hamdi',
-    'Nasr El-Din',
-  ];
-  const femaleNames = [
-    'Fatima Ahmed',
-    'Aya Mohamed',
-    'Mariam Hassan',
-    'Yasmin Ali',
-    'Nour Ibrahim',
-    'Salma Farid',
-    'Laila Abdel',
-    'Rania Samir',
-    'Dina Khalil',
-    'Mona Rashad',
-    'Hana Mahmoud',
-    'Amira Nasser',
-    'Shereen Fawzy',
-    'Nadia Taha',
-    'Reem Gamal',
-    'Samar Osman',
-    'Layla Essam',
-    'Rasha Magdy',
-    'Heba Hamdi',
-    'Zeinab El-Din',
-  ];
-
-  const startDate = new Date('2024-01-01');
-  const endDate = new Date('2025-01-25');
-
-  return Array.from({ length: count }, (_, i) => {
-    const isFemale = i % 2 === 1;
-    const name = isFemale ? getRandomItem(femaleNames) : getRandomItem(maleNames);
-    const firstName = name.split(' ')[0].toLowerCase();
-    const lastName = name.split(' ')[1].toLowerCase();
-
-    const createdAt = getRandomDate(startDate, endDate);
-    const updatedAt = new Date(createdAt.getTime() + Math.random() * (2 * 24 * 60 * 60 * 1000)); // 0-2 days later
-
-    return {
-      id: cuid(),
-      userId: users[i % users.length].id,
-      name,
-      email: `${firstName}.${lastName}@example.com`,
-      phone: `+2012345678${i < 10 ? '0' + i : i}`,
-      image: `/avatars/${isFemale ? 'female' : 'male'}${(i % 5) + 1}.png`,
-      createdAt,
-      updatedAt,
-    };
-  });
+const generateRandomEmail = (name: string) => {
+  // the email format is: <first-name>.<last-name>@example.com
+  return `${name.split(' ').join('.').toLowerCase()}@example.com`;
 };
 
-// Function to generate invoices
-const generateInvoices = (users: User[], customers: Customer[], count = 30) => {
-  const startDate = new Date('2024-08-01');
-  const endDate = new Date('2024-12-20');
+const generateRandomPhoneNumber = () => {
+  // 1. Define the number prefixes
+  const prefixes = ['010', '011', '012', '015'];
 
-  return Array.from({ length: count }, (_, i) => {
-    const createdAt = getRandomDate(startDate, endDate);
-    const customer = getRandomItem(customers);
+  // 2. Generate a random prefix
+  const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
 
-    return {
-      id: cuid(),
-      userId: customer.userId,
-      customerId: customer.id,
-      amount: Math.round(75 + Math.random() * 375) + (Math.random() > 0.5 ? 0 : 0.99),
-      status: Math.random() > 0.5 ? InvoiceStatus.paid : InvoiceStatus.pending,
-      createdAt,
-      updatedAt: createdAt,
-    };
-  });
+  // 3. Generate the rest of the number
+  const restOfNumber = Math.floor(10000000 + Math.random() * 90000000).toString();
+
+  // 4. Return the full number
+  return randomPrefix + restOfNumber;
 };
 
-// Function to generate revenues
 const generateRevenues = (users: User[]) => {
   const revenues: Revenue[] = [];
 
@@ -134,6 +143,86 @@ const generateRevenues = (users: User[]) => {
   return revenues;
 };
 
+const generateCustomers = () => {
+  let customers: Customer[] = [];
+
+  users.forEach((user) => {
+    for (let i = 0; i < 20; i++) {
+      // 0. Generate a random gender and image index from 1 to 5
+      const gender = Math.random() > 0.5 ? 'male' : 'female';
+      const imageIndex = Math.floor(Math.random() * 5) + 1;
+
+      // 1. Generate a random id using cuid
+      const id = cuid();
+
+      // 2. set the user id
+      const userId = user.id;
+
+      // 4. Generate a random name
+      const name = generateRandomName(gender);
+
+      // 3. Generate a random email
+      const email = generateRandomEmail(name);
+
+      // 5. Generate a random phone number
+      const phone = generateRandomPhoneNumber();
+
+      // 6. Generate a random image
+      const image = `/avatars/${gender}${imageIndex}.png`;
+
+      // 7. construct the customer object
+      const customer: Customer = {
+        id,
+        userId,
+        name,
+        email,
+        phone,
+        image,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      // 8. Make sure this customer email is not exist in the customers array
+      if (customers.find((c) => c.email === customer.email)) {
+        continue;
+      }
+      customers.push(customer);
+    }
+  });
+
+  return customers;
+};
+
+const generateInvoices = (customers: Customer[]) => {
+  let invoices: Invoice[] = [];
+
+  customers.forEach((customer) => {
+    const numberOfInvoices = Math.floor(1 + Math.random() * 10);
+    for (let i = 0; i < numberOfInvoices; i++) {
+      const id = cuid();
+      const userId = customer.userId;
+      const customerId = customer.id;
+      const amount = new Decimal(Math.floor(1000 + Math.random() * 900));
+      const status = Math.random() > 0.5 ? InvoiceStatus.paid : InvoiceStatus.pending;
+
+      const invoice: Invoice = {
+        id,
+        userId,
+        customerId,
+        amount,
+        status,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      invoices.push(invoice);
+    }
+  });
+
+  return invoices;
+};
+
+// DATA
 const users: User[] = [
   {
     id: cuid(),
@@ -164,8 +253,13 @@ const users: User[] = [
   },
 ];
 
-const customers = generateCustomers(users, 20);
-const invoices = generateInvoices(users, customers, 500);
-const revenues = generateRevenues(users);
+const customers: Customer[] = generateCustomers();
+const invoices: Invoice[] = generateInvoices(customers);
+const revenues: Revenue[] = generateRevenues(users);
+
+// Randomize the order of the arrays
+users.sort(() => Math.random() - 0.5);
+customers.sort(() => Math.random() - 0.5);
+invoices.sort(() => Math.random() - 0.5);
 
 export { users, customers, invoices, revenues };
