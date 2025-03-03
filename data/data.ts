@@ -124,7 +124,7 @@ export const fetchRevenueByUserId = async (userId: string) => {
   return revenue;
 };
 
-export const fetchCustomersPageByUserId = async (userId: string): Promise<CustomersPageByUserId[]> => {
+export const fetchCustomersPageByUserId = async (userId: string, search: string): Promise<CustomersPageByUserId[]> => {
   const customers: CustomersPageByUserId[] = await db.$queryRaw`
     SELECT customers.id,
           customers.name,
@@ -152,7 +152,13 @@ export const fetchCustomersPageByUserId = async (userId: string): Promise<Custom
     FROM customers
     INNER JOIN invoices ON customers.id = invoices.customer_id
     WHERE invoices.user_id = ${userId}
+    AND (
+      customers.name ILIKE ${`%${search}%`} OR
+      customers.email ILIKE ${`%${search}%`} OR
+      customers.phone ILIKE ${`%${search}%`}
+    )
     GROUP BY customers.id
+    LIMIT 5
   `;
 
   // prisma returns bigInts, so we need to convert them to regular js numbers

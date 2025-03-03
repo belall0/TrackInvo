@@ -3,10 +3,24 @@ import { DataTable } from '@/components/customers/data-table';
 import { auth } from '@/auth/auth';
 import { fetchCustomersPageByUserId } from '@/data/data';
 
-export default async function DemoPage() {
-  const session = await auth();
-  const data = await fetchCustomersPageByUserId(session?.user?.id!);
+interface CustomersProps {
+  searchParams?: Promise<{
+    search?: string;
+  }>;
+}
 
+const Customers = async (props: CustomersProps) => {
+  // 1. Get the search params from the props (if any) to filter the data
+  const searchParams = await props.searchParams;
+  const search = searchParams?.search || '';
+
+  // 2. get the user info before fetching the data
+  const session = await auth();
+
+  // 3. Fetch the data based on the user id and the search params (if any)
+  const data = await fetchCustomersPageByUserId(session?.user?.id!, search);
+
+  // 4. pass the data to the client-side component to render the UI
   return (
     <div className="container mx-auto py-10">
       <div className="mb-6">
@@ -19,4 +33,6 @@ export default async function DemoPage() {
       <DataTable columns={columns} data={data} />
     </div>
   );
-}
+};
+
+export default Customers;

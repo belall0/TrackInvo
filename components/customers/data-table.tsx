@@ -1,7 +1,8 @@
 'use client';
+
 import { VscSettings } from 'react-icons/vsc';
 import { CiSearch } from 'react-icons/ci';
-
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
   ColumnDef,
   SortingState,
@@ -25,6 +26,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import * as React from 'react';
+import { ChangeEvent } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -33,7 +36,6 @@ interface DataTableProps<TData, TValue> {
 
 export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
     // to mark some columns as invisible by default
     phone: false,
@@ -48,16 +50,31 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
 
     state: {
       sorting,
-      columnFilters,
       columnVisibility,
     },
   });
+
+  // Searching Logic
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  const handleSearch = useDebouncedCallback((term: string) => {
+    const params = new URLSearchParams(searchParams);
+
+    if (term) {
+      params.set('search', term);
+    } else {
+      params.delete('search');
+    }
+
+    replace(`${pathname}?${params.toString()}`);
+  }, 300);
 
   return (
     <div>
@@ -65,9 +82,11 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
         {/* Search bar */}
         <div className="relative flex flex-1 flex-shrink-0">
           <Input
-            placeholder="Search Customers..."
-            value={(table.getColumn('email')?.getFilterValue() as string) ?? ''}
-            onChange={(event) => table.getColumn('email')?.setFilterValue(event.target.value.trim())}
+            placeholder="Search by name, email, or phone..."
+            defaultValue={searchParams.get('search')?.toString()}
+            onChange={(e: ChangeEvent) => {
+              handleSearch((e.target as HTMLInputElement).value);
+            }}
             className="mr-4 h-10 w-full border border-gray-200 pl-10"
           />
 
