@@ -61,8 +61,8 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
   return (
     <div>
-      {/* Search bar */}
       <div className="flex items-center py-4">
+        {/* Search bar */}
         <div className="relative flex flex-1 flex-shrink-0">
           <Input
             placeholder="Search Customers..."

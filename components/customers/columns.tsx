@@ -2,8 +2,14 @@
 
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { ArrowUpDown } from 'lucide-react';
+import { LuEye } from 'react-icons/lu';
+import { LuTrash } from 'react-icons/lu';
+import { LuCopy } from 'react-icons/lu';
+import { LuPencil } from 'react-icons/lu';
+
+import { Button } from '@/components/ui/button';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -179,15 +185,24 @@ export const columns: ColumnDef<Customer>[] = [
 
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(customer.email)}>
-              Copy customer email
+              <LuCopy /> <span>Copy customer email</span>
             </DropdownMenuItem>
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>Delete customer</DropdownMenuItem>
+            <DropdownMenuItem>
+              <LuEye />
+              <span>View customer</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <LuPencil />
+              <span>Edit customer</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <LuTrash />
+              <span>Delete customer</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
