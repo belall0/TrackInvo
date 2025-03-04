@@ -25,6 +25,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -85,7 +86,7 @@ const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValu
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center gap-x-4 py-4">
         {/* Search bar */}
         <div className="relative flex flex-1 flex-shrink-0">
           <Input
@@ -99,6 +100,10 @@ const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValu
 
           <CiSearch className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
         </div>
+
+        <Link href="/dashboard/customers/create">
+          <Button>Create Customer</Button>
+        </Link>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

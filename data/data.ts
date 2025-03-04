@@ -127,7 +127,7 @@ export const fetchCustomers = async (userId: string, search: string): Promise<Cu
           customers.email,
           customers.phone,
           customers.image,
-          count(*) AS total_invoices,
+          count(invoices.id) AS total_invoices,
           SUM(CASE
                   WHEN invoices.status = 'paid' THEN 1
                   ELSE 0
@@ -146,8 +146,8 @@ export const fetchCustomers = async (userId: string, search: string): Promise<Cu
               END) AS total_pending,
           SUM(invoices.amount) AS total_revenue
     FROM customers
-    INNER JOIN invoices ON customers.id = invoices.customer_id
-    WHERE invoices.user_id = ${userId}
+    LEFT JOIN invoices ON customers.id = invoices.customer_id
+    WHERE customers.user_id = ${userId}
     AND (
       customers.name ILIKE ${`%${search}%`} OR
       customers.email ILIKE ${`%${search}%`} OR
@@ -168,4 +168,15 @@ export const fetchCustomers = async (userId: string, search: string): Promise<Cu
   }));
 
   return resultsWithRegularNumbers;
+};
+
+export const getCustomerByEmail = async (userId: string, email: string) => {
+  const customer = await db.customer.findMany({
+    where: {
+      userId,
+      email,
+    },
+  });
+
+  return customer;
 };
