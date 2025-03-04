@@ -6,12 +6,10 @@ import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
   ColumnDef,
   SortingState,
-  ColumnFiltersState,
   VisibilityState,
   flexRender,
   getFilteredRowModel,
   getCoreRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -26,15 +24,16 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 import * as React from 'react';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  totalPages?: number;
 }
 
-export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, totalPages }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
     // to mark some columns as invisible by default
@@ -42,16 +41,19 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
     paid_invoices: false,
     pending_invoices: false,
   });
+  console.log(totalPages);
 
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
+    manualPagination: true,
+    pageCount: totalPages,
+    autoResetPageIndex: true, // reset the page index when the data changes
 
     state: {
       sorting,
@@ -66,11 +68,13 @@ export function DataTable<TData, TValue>({ columns, data }: DataTableProps<TData
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
+    params.set('page', '1');
 
     if (term) {
       params.set('search', term);
     } else {
       params.delete('search');
+      params.delete('page');
     }
 
     replace(`${pathname}?${params.toString()}`);

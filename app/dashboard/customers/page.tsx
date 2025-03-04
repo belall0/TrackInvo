@@ -1,11 +1,12 @@
 import { columns } from '@/components/customers/columns';
 import { DataTable } from '@/components/customers/data-table';
 import { auth } from '@/auth/auth';
-import { fetchCustomersPageByUserId } from '@/data/data';
+import { fetchCustomers, fetchTotalCustomersPages } from '@/data/data';
 
 interface CustomersProps {
   searchParams?: Promise<{
     search?: string;
+    page?: number;
   }>;
 }
 
@@ -13,12 +14,14 @@ const Customers = async (props: CustomersProps) => {
   // 1. Get the search params from the props (if any) to filter the data
   const searchParams = await props.searchParams;
   const search = searchParams?.search || '';
+  const page = searchParams?.page || 1;
 
   // 2. get the user info before fetching the data
   const session = await auth();
 
   // 3. Fetch the data based on the user id and the search params (if any)
-  const data = await fetchCustomersPageByUserId(session?.user?.id!, search);
+  const data = await fetchCustomers(session?.user?.id!, search, page);
+  const totalCustomersPages = await fetchTotalCustomersPages(session?.user?.id!, search);
 
   // 4. pass the data to the client-side component to render the UI
   return (
@@ -30,7 +33,7 @@ const Customers = async (props: CustomersProps) => {
         </p>
       </div>
 
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data} totalPages={totalCustomersPages} />
     </div>
   );
 };

@@ -1,7 +1,7 @@
 export type { User, Customer, Invoice, Revenue } from '@prisma/client';
 export { InvoiceStatus } from '@prisma/client';
 
-export interface CustomersPageByUserId {
+export interface CustomersData {
   id: string;
   name: string;
   email: string;

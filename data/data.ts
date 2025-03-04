@@ -1,9 +1,5 @@
-// TODO: Add Error Handling
-// TODO: ADD COMPREHENSIVE TYPES
-// TODO: ADD DOCS
-
 import db from '@/data/db';
-import { CustomersPageByUserId } from '@/lib/types';
+import { CustomersData } from '@/lib/types';
 import { Prisma } from '@prisma/client';
 
 export const createUser = async (user: Prisma.UserCreateInput) => {
@@ -124,8 +120,10 @@ export const fetchRevenueByUserId = async (userId: string) => {
   return revenue;
 };
 
-export const fetchCustomersPageByUserId = async (userId: string, search: string): Promise<CustomersPageByUserId[]> => {
-  const customers: CustomersPageByUserId[] = await db.$queryRaw`
+export const fetchCustomers = async (userId: string, search: string, page: number): Promise<CustomersData[]> => {
+  const offset = (page - 1) * 5; // 5 is the limit per page
+
+  const customers: CustomersData[] = await db.$queryRaw`
     SELECT customers.id,
           customers.name,
           customers.email,
@@ -159,6 +157,7 @@ export const fetchCustomersPageByUserId = async (userId: string, search: string)
     )
     GROUP BY customers.id
     LIMIT 5
+    OFFSET ${offset}
   `;
 
   // prisma returns bigInts, so we need to convert them to regular js numbers
@@ -175,8 +174,20 @@ export const fetchCustomersPageByUserId = async (userId: string, search: string)
   return resultsWithRegularNumbers;
 };
 
+// fetch total number of pages for pagination based on search query
+export const fetchTotalCustomersPages = async (userId: string, search: string): Promise<number> => {
+  const totalCustomers = await db.customer.count({
+    where: {
+      userId,
+      OR: [{ name: { contains: search } }, { email: { contains: search } }, { phone: { contains: search } }],
+    },
+  });
+
+  return Math.ceil(totalCustomers / 5); // 5 is the limit per page
+};
+
 const testQueries = async () => {
-  // await fetchCustomersPageByUserId('cm7j4xg4a0000sgw0brhm4jw9');
+  // await fetchCustomers('cm7j4xg4a0000sgw0brhm4jw9');
 };
 
 testQueries();
