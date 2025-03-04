@@ -120,9 +120,7 @@ export const fetchRevenueByUserId = async (userId: string) => {
   return revenue;
 };
 
-export const fetchCustomers = async (userId: string, search: string, page: number): Promise<CustomersData[]> => {
-  const offset = (page - 1) * 5; // 5 is the limit per page
-
+export const fetchCustomers = async (userId: string, search: string): Promise<CustomersData[]> => {
   const customers: CustomersData[] = await db.$queryRaw`
     SELECT customers.id,
           customers.name,
@@ -156,8 +154,6 @@ export const fetchCustomers = async (userId: string, search: string, page: numbe
       customers.phone ILIKE ${`%${search}%`}
     )
     GROUP BY customers.id
-    LIMIT 5
-    OFFSET ${offset}
   `;
 
   // prisma returns bigInts, so we need to convert them to regular js numbers
@@ -173,21 +169,3 @@ export const fetchCustomers = async (userId: string, search: string, page: numbe
 
   return resultsWithRegularNumbers;
 };
-
-// fetch total number of pages for pagination based on search query
-export const fetchTotalCustomersPages = async (userId: string, search: string): Promise<number> => {
-  const totalCustomers = await db.customer.count({
-    where: {
-      userId,
-      OR: [{ name: { contains: search } }, { email: { contains: search } }, { phone: { contains: search } }],
-    },
-  });
-
-  return Math.ceil(totalCustomers / 5); // 5 is the limit per page
-};
-
-const testQueries = async () => {
-  // await fetchCustomers('cm7j4xg4a0000sgw0brhm4jw9');
-};
-
-testQueries();
