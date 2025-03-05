@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { ColumnDef } from '@tanstack/react-table';
 import { MoreHorizontal } from 'lucide-react';
 import { ArrowUpDown } from 'lucide-react';
@@ -7,6 +8,10 @@ import { LuEye } from 'react-icons/lu';
 import { LuTrash } from 'react-icons/lu';
 import { LuCopy } from 'react-icons/lu';
 import { LuPencil } from 'react-icons/lu';
+import { deleteCustomerAction } from '@/lib/actions';
+import { toast } from 'react-toastify';
+import Image from 'next/image';
+import { useActionState, useEffect, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 
@@ -18,7 +23,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Image from 'next/image';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export type Customer = {
   id: string;
@@ -172,7 +187,31 @@ export const columns: ColumnDef<Customer>[] = [
   {
     id: 'actions',
     cell: ({ row }) => {
+      const [isPending, startTransition] = useTransition();
+      const [data, action] = useActionState(deleteCustomerAction, undefined);
+      const router = useRouter();
       const customer = row.original;
+
+      // Handle action result
+      useEffect(() => {
+        if (data?.success === true) {
+          toast.success(data.message);
+          router.refresh();
+        } else if (data?.success === false) {
+          toast.error(data.message);
+        }
+      }, [data]);
+
+      // Prepare delete handler
+      const handleDelete = () => {
+        console.log(`handle`);
+        const formData = new FormData();
+        formData.append('customerId', customer.id);
+
+        startTransition(() => {
+          action(formData);
+        });
+      };
 
       return (
         <DropdownMenu>
@@ -185,6 +224,7 @@ export const columns: ColumnDef<Customer>[] = [
 
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(customer.email)}>
               <LuCopy /> <span>Copy customer email</span>
             </DropdownMenuItem>
@@ -195,14 +235,37 @@ export const columns: ColumnDef<Customer>[] = [
               <LuEye />
               <span>View customer</span>
             </DropdownMenuItem>
+
             <DropdownMenuItem>
               <LuPencil />
               <span>Edit customer</span>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <LuTrash />
-              <span>Delete customer</span>
-            </DropdownMenuItem>
+
+            <AlertDialog>
+              <AlertDialogTrigger>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault(); // Prevent default dropdown behavior
+                  }}>
+                  <LuTrash />
+                  <span>Delete customer</span>
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete the customer account for{' '}
+                    <span className="font-bold">{customer.name}</span>.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleDelete}>Continue</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </DropdownMenuContent>
         </DropdownMenu>
       );

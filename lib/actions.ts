@@ -169,3 +169,39 @@ export const createCustomerAction = async (prevState: any, data: FormData | Crea
     message: 'Customer created successfully',
   });
 };
+
+export const deleteCustomerAction = async (prevState: any, data: FormData) => {
+  const session = await auth();
+  const customerId = data.get('customerId') as string;
+
+  const customer = await db.customer.findUnique({
+    where: {
+      id: customerId,
+    },
+  });
+
+  if (!customer) {
+    return createResponse({
+      success: false,
+      message: 'Customer not found',
+    });
+  }
+
+  if (customer.userId !== session?.user?.id) {
+    return createResponse({
+      success: false,
+      message: 'You do not have permission to delete this customer',
+    });
+  }
+
+  await db.customer.delete({
+    where: {
+      id: customerId,
+    },
+  });
+
+  return createResponse({
+    success: true,
+    message: 'Customer deleted successfully',
+  });
+};
