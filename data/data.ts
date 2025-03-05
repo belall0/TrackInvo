@@ -180,3 +180,17 @@ export const getCustomerByEmail = async (userId: string, email: string) => {
 
   return customer;
 };
+
+export const getCustomerData = async (userId: string, customerId: string) => {
+  const customers = await db.customer.findUnique({
+    where: {
+      id: customerId,
+      userId,
+    },
+    include: {
+      invoices: true,
+    },
+  });
+
+  return customers;
+};

@@ -231,7 +231,7 @@ export const columns: ColumnDef<Customer>[] = [
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/dashboard/customers/${customer.id}`)}>
               <LuEye />
               <span>View customer</span>
             </DropdownMenuItem>
