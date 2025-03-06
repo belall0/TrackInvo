@@ -3,8 +3,7 @@ import { fetchLatestInvoicesByUserId } from '@/data/data';
 
 import clsx from 'clsx';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
-
-import { LatestInvoice } from '@/lib/definitions';
+import { formatCurrency } from '@/lib/utils';
 
 const LatestInvoices = async ({ userId }: { userId?: string }) => {
   const latestInvoices = await fetchLatestInvoicesByUserId(userId!);
@@ -38,7 +37,7 @@ const LatestInvoices = async ({ userId }: { userId?: string }) => {
                   </div>
                 </div>
 
-                <p className={`truncate text-sm font-medium md:text-base`}>{invoice.amount}</p>
+                <p className={`truncate text-sm font-medium md:text-base`}>{formatCurrency(invoice.amount)}</p>
               </div>
             );
           })}

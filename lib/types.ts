@@ -14,3 +14,23 @@ export interface CustomersData {
   total_pending: number;
   total_revenue: number;
 }
+
+export interface CustomerProfileData {
+  id: string;
+  userId: string;
+  name: string;
+  email: string;
+  phone: string;
+  image: string;
+  createdAt: Date;
+  updatedAt: Date;
+  invoices: {
+    id: string;
+    userId: string;
+    customerId: string;
+    amount: number;
+    status: 'paid' | 'pending';
+    createdAt: Date;
+    updatedAt: Date;
+  }[];
+}

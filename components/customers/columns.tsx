@@ -34,6 +34,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { formatCurrency } from '@/lib/utils';
 
 export type Customer = {
   id: string;
@@ -109,7 +110,7 @@ export const columns: ColumnDef<Customer>[] = [
   },
   {
     accessorKey: 'paid_invoices',
-    // header: 'Paid Invoices',
+
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -118,13 +119,13 @@ export const columns: ColumnDef<Customer>[] = [
         </Button>
       );
     },
+
     cell: ({ row }) => {
       return <div className="text-center">{row.original.paid_invoices}</div>;
     },
   },
   {
     accessorKey: 'pending_invoices',
-    // header: 'Pending Invoices',
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -137,40 +138,9 @@ export const columns: ColumnDef<Customer>[] = [
       return <div className="text-center">{row.original.pending_invoices}</div>;
     },
   },
-  {
-    accessorKey: 'total_paid',
-    // header: 'Total Paid',
-    header: ({ column }) => {
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Total Paid
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      return <div className="text-center">{row.original.total_paid}</div>;
-    },
-  },
-  {
-    accessorKey: 'total_pending',
-    // header: 'Total Pending',
-    header: ({ column }) => {
-      return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Total Pending
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      return <div className="text-center">{row.original.total_pending}</div>;
-    },
-  },
 
   {
     accessorKey: 'total_revenue',
-    // header: 'Total Revenue',
     header: ({ column }) => {
       return (
         <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
@@ -180,7 +150,36 @@ export const columns: ColumnDef<Customer>[] = [
       );
     },
     cell: ({ row }) => {
-      return <div className="text-center">{row.original.total_revenue}</div>;
+      return <div className="text-center">{formatCurrency(row.original.total_revenue)}</div>;
+    },
+  },
+
+  {
+    accessorKey: 'total_paid',
+    header: ({ column }) => {
+      return (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          Total Paid
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return <div className="text-center">{formatCurrency(row.original.total_paid)}</div>;
+    },
+  },
+  {
+    accessorKey: 'total_pending',
+    header: ({ column }) => {
+      return (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          Total Pending
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      return <div className="text-center">{formatCurrency(row.original.total_pending)}</div>;
     },
   },
 
