@@ -1,7 +1,7 @@
 import type { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
-import { loginSchema } from '@/lib/schema';
+import { loginSchema } from '@/lib/schemas';
 import db from '@/data/db';
 
 export default {

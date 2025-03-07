@@ -3,20 +3,21 @@
 import { useActionState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { signupSchema, SignupValues } from '@/lib/schema';
-import { signupAction } from '@/lib/actions';
+
+import { signupSchema } from '@/lib/schemas';
+import { SignupFormData } from '@/lib/types';
+import { signup } from '@/lib/actions';
 
 // UI Components
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AuthFormWrapper from '@/components/auth/AuthFormWrapper';
-import FormSuccess from '@/components/FormSuccess';
-import FormError from '@/components/FormError';
+import FormStatus from '@/components/auth/FormStatus';
 
 // Type Definitions for form fields
 interface FormFieldConfig {
-  name: keyof SignupValues;
+  name: keyof SignupFormData;
   label: string;
   type: string;
   placeholder: string;
@@ -52,12 +53,12 @@ const formFields: FormFieldConfig[] = [
 
 const SignupForm = () => {
   // 1. useActionState hook to get the response from the loginAction
-  const [data, action] = useActionState(signupAction, undefined);
+  const [data, action] = useActionState(signup, undefined);
   // 2. useTransition hook to handle the pending state of the form
   const [isPending, startTransition] = useTransition();
 
   // 3. useForm hook to handle the form state
-  const form = useForm<SignupValues>({
+  const form = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       name: '',
@@ -68,7 +69,7 @@ const SignupForm = () => {
   });
 
   // 4. onSubmit to handle the form validation using zod and call the action
-  function onSubmit(values: SignupValues) {
+  function onSubmit(values: SignupFormData) {
     // 4.1 startTransition to set the pending state
     startTransition(() => {
       action(values);
@@ -94,12 +95,11 @@ const SignupForm = () => {
   );
 
   // 6. renderFormStatus to render the form status based on the response from the loginAction
-  const renderFormStatus = () => (
-    <>
-      {data?.success && <FormSuccess message={data.message} />}
-      {data?.success === false && <FormError message={data.message} />}
-    </>
-  );
+  const renderFormStatus = () => {
+    if (!data || data.message === undefined) return null;
+
+    return <FormStatus type={data.success ? 'success' : 'error'} message={data.message} />;
+  };
 
   return (
     <AuthFormWrapper
