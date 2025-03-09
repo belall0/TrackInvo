@@ -1,5 +1,9 @@
-import { LuHouse } from 'react-icons/lu';
+import Link from 'next/link';
 import { signOut } from '@/auth/auth';
+
+import { LuHouse } from 'react-icons/lu';
+import { HiOutlineUsers } from 'react-icons/hi2';
+import { CiPower } from 'react-icons/ci';
 
 import {
   Sidebar,
@@ -13,27 +17,23 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import Logo from '@/components/common/Logo';
-import Link from 'next/link';
-import { CiPower } from 'react-icons/ci';
 
-// Menu items.
 const items = [
   {
     title: 'Home',
     url: '/dashboard',
     icon: LuHouse,
   },
+  { title: 'Customers', url: '/dashboard/customers', icon: HiOutlineUsers },
 ];
 
 const AppSidebar = () => {
   return (
     <Sidebar>
-      {/* Sidebar header */}
       <SidebarHeader className="flex items-center justify-center">
         <Logo />
       </SidebarHeader>
 
-      {/* Sidebar content */}
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupContent>
