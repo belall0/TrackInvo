@@ -1,17 +1,21 @@
 import { ReactNode } from 'react';
-import SideNav from '@/components/SideNav';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 
-export const experimental_ppr = true;
+import AppSidebar from '@/components/common/Sidebar';
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
-      <div className="w-full flex-none md:w-64">
-        <SideNav />
-      </div>
+    <SidebarProvider>
+      <AppSidebar />
 
-      <div className="flex-grow p-6 md:overflow-y-auto md:p-12">{children}</div>
-    </div>
+      <main className="flex h-full w-full flex-col">
+        <div className="flex items-center border-b border-gray-200 p-4">
+          <SidebarTrigger className="mr-4 rounded-md p-2 hover:bg-gray-100" />
+        </div>
+
+        <div className="flex-1 overflow-auto p-6">{children}</div>
+      </main>
+    </SidebarProvider>
   );
 };
 
