@@ -4,9 +4,9 @@ import { useActionState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import { signupSchema } from '@/lib/schemas';
-import { SignupFormData } from '@/lib/types';
-import { signup } from '@/lib/actions';
+import { signupSchema } from '@/lib/schemas/auth';
+import { SignupFormData } from '@/lib/types/auth';
+import { signup } from '@/lib/actions/auth';
 
 // UI Components
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';

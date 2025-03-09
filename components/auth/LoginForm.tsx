@@ -4,9 +4,9 @@ import { useActionState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { loginSchema } from '@/lib/schemas';
-import { LoginFormData } from '@/lib/types';
-import { login } from '@/lib/actions';
+import { loginSchema } from '@/lib/schemas/auth';
+import { LoginFormData } from '@/lib/types/auth';
+import { login } from '@/lib/actions/auth';
 
 // UI Components
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';

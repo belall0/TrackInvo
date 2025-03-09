@@ -1,10 +1,10 @@
 'use server';
 
 import bcrypt from 'bcryptjs';
-import { loginSchema, signupSchema } from '@/lib/schemas';
-import { LoginFormData, SignupFormData } from '@/lib/types';
+import { loginSchema, signupSchema } from '@/lib/schemas/auth';
+import { LoginFormData, SignupFormData } from '@/lib/types/auth';
 import { createResponse } from '@/lib/utils';
-import { createUser, getUserByEmail } from '@/lib/db';
+import { createUser, getUserByEmail } from '@/lib/db/auth';
 import { signIn } from '@/auth/auth';
 import { DEFAULT_LOGIN_REDIRECT } from '@/auth/routes';
 

@@ -1,4 +1,4 @@
-import db from '@/data/db';
+import db from '@/lib/db/prisma';
 
 export const fetchCustomersCountByUserId = async (userId: string) => {
   const count = await db.customer.count({
@@ -87,4 +87,19 @@ export const fetchLatestInvoicesByUserId = async (userId: string) => {
   }));
 
   return res;
+};
+
+export const fetchRevenueByUserId = async (userId: string) => {
+  const revenue = await db.revenue.findMany({
+    where: {
+      userId,
+    },
+    select: {
+      month: true,
+      year: true,
+      revenue: true,
+    },
+  });
+
+  return revenue;
 };

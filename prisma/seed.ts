@@ -1,6 +1,6 @@
-import db from '@/data/db';
+import db from '@/lib/db/prisma';
 import { Prisma } from '@prisma/client';
-import { users, customers, invoices, revenues } from '@/data/placeholder-data';
+import { users, customers, invoices, revenues } from '@/lib/db/seed-data';
 
 const seedUsers = async (users: Prisma.UserCreateManyInput[]) => {
   await db.user.createMany({ data: users });

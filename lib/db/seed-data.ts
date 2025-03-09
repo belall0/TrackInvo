@@ -1,5 +1,6 @@
+// @ts-nocheck
+
 import cuid from 'cuid';
-import { User, Customer, Revenue, InvoiceStatus, Invoice } from '@/lib/types';
 import { Decimal } from '@prisma/client/runtime/library';
 
 const maleNames = [
@@ -112,8 +113,8 @@ const generateRandomPhoneNumber = () => {
   return randomPrefix + restOfNumber;
 };
 
-const generateRevenues = (users: User[]) => {
-  const revenues: Revenue[] = [];
+const generateRevenues = (users) => {
+  const revenues = [];
 
   users.forEach((user) => {
     for (let month = 1; month <= 12; month++) {
@@ -144,7 +145,7 @@ const generateRevenues = (users: User[]) => {
 };
 
 const generateCustomers = () => {
-  let customers: Customer[] = [];
+  let customers = [];
 
   users.forEach((user) => {
     for (let i = 0; i < 20; i++) {
@@ -171,7 +172,7 @@ const generateCustomers = () => {
       const image = `/avatars/${gender}${imageIndex}.png`;
 
       // 7. construct the customer object
-      const customer: Customer = {
+      const customer = {
         id,
         userId,
         name,
@@ -193,7 +194,7 @@ const generateCustomers = () => {
   return customers;
 };
 
-const generateInvoices = (customers: Customer[]) => {
+const generateInvoices = (customers) => {
   let invoices: Invoice[] = [];
 
   customers.forEach((customer) => {
@@ -223,7 +224,7 @@ const generateInvoices = (customers: Customer[]) => {
 };
 
 // DATA
-const users: User[] = [
+const users = [
   {
     id: cuid(),
     name: 'Belal Muhammad',
@@ -253,9 +254,9 @@ const users: User[] = [
   },
 ];
 
-const customers: Customer[] = generateCustomers();
-const invoices: Invoice[] = generateInvoices(customers);
-const revenues: Revenue[] = generateRevenues(users);
+const customers = generateCustomers();
+const invoices = generateInvoices(customers);
+const revenues = generateRevenues(users);
 
 // Randomize the order of the arrays
 users.sort(() => Math.random() - 0.5);

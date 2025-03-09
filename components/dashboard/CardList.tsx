@@ -3,7 +3,7 @@ import {
   fetchInvoicesCountByUserId,
   fetchTotalPaidAmountByUserId,
   fetchTotalPendingAmountByUserId,
-} from '@/lib/db';
+} from '@/lib/db/user';
 import { formatCurrency } from '@/lib/utils';
 import SummaryCard from '@/components/common/SummaryCard';
 import { HiOutlineBanknotes, HiOutlineClock, HiOutlineUserGroup, HiOutlineInbox } from 'react-icons/hi2';

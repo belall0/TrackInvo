@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { HiArrowPath } from 'react-icons/hi2';
 
 import { formatCurrency } from '@/lib/utils';
-import { fetchLatestInvoicesByUserId } from '@/lib/db';
+import { fetchLatestInvoicesByUserId } from '@/lib/db/user';
 
 const LatestInvoices = async ({ userId }: { userId: string }) => {
   const latestInvoices = await fetchLatestInvoicesByUserId(userId);

@@ -1,4 +1,4 @@
-import { fetchRevenueByUserId } from '@/data/data';
+import { fetchRevenueByUserId } from '@/lib/db/user';
 import { CiCalendar } from 'react-icons/ci';
 import { months } from '@/lib/constants';
 
