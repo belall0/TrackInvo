@@ -1,24 +1,28 @@
-import Card from '@/components/dashboard/Card';
 import {
   fetchCustomersCountByUserId,
   fetchInvoicesCountByUserId,
   fetchTotalPaidAmountByUserId,
   fetchTotalPendingAmountByUserId,
-} from '@/data/data';
+} from '@/lib/db';
 import { formatCurrency } from '@/lib/utils';
+import SummaryCard from '@/components/common/SummaryCard';
+import { HiOutlineBanknotes, HiOutlineClock, HiOutlineUserGroup, HiOutlineInbox } from 'react-icons/hi2';
 
-const CardList = async ({ userId }: { userId?: string }) => {
-  const numberOfCustomers = await fetchCustomersCountByUserId(userId!);
-  const numberOfInvoices = await fetchInvoicesCountByUserId(userId!);
-  const totalPaidInvoices = await fetchTotalPaidAmountByUserId(userId!);
-  const totalPendingInvoices = await fetchTotalPendingAmountByUserId(userId!);
+interface CardListProps {
+  userId: string;
+}
+const CardList = async ({ userId }: CardListProps) => {
+  const numberOfCustomers = await fetchCustomersCountByUserId(userId);
+  const numberOfInvoices = await fetchInvoicesCountByUserId(userId);
+  const totalPaidInvoices = await fetchTotalPaidAmountByUserId(userId);
+  const totalPendingInvoices = await fetchTotalPendingAmountByUserId(userId);
 
   return (
     <>
-      <Card title="Collected" value={formatCurrency(totalPaidInvoices)} type="collected" />
-      <Card title="Pending" value={formatCurrency(totalPendingInvoices)} type="pending" />
-      <Card title="Total Invoices" value={numberOfInvoices} type="invoices" />
-      <Card title="Total Customers" value={numberOfCustomers} type="customers" />
+      <SummaryCard title="Collected" value={formatCurrency(totalPaidInvoices)} Icon={HiOutlineBanknotes} />
+      <SummaryCard title="Pending" value={formatCurrency(totalPendingInvoices)} Icon={HiOutlineClock} />
+      <SummaryCard title="Total Invoices" value={numberOfInvoices} Icon={HiOutlineUserGroup} />
+      <SummaryCard title="Total Customers" value={numberOfCustomers} Icon={HiOutlineInbox} />
     </>
   );
 };

@@ -2,8 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaArrowRightLong } from 'react-icons/fa6';
 
-// UI Components
-import Logo from '@/components/Logo';
+import Logo from '@/components/common/Logo';
 import { Button } from '@/components/ui/button';
 
 const page = () => {
@@ -23,14 +22,14 @@ const page = () => {
             <Button className={'bg-blue-600 hover:bg-blue-700'}>
               <Link href="/auth/login" className="flex items-center gap-2">
                 <span>Login</span>
-                <FaArrowRightLong className="h-4 w-4" />
+                <FaArrowRightLong className="size-4" />
               </Link>
             </Button>
 
             <Button className={'border border-blue-600 bg-white text-blue-600 hover:bg-blue-50'}>
               <Link href="/auth/signup" className="flex items-center gap-2">
                 <span>Sign up</span>
-                <FaArrowRightLong className="h-4 w-4" />
+                <FaArrowRightLong className="size-4" />
               </Link>
             </Button>
           </div>

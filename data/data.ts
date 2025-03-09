@@ -1,5 +1,4 @@
 import db from '@/data/db';
-import { CustomersData } from '@/lib/types';
 import { Prisma } from '@prisma/client';
 
 export const createUser = async (user: Prisma.UserCreateInput) => {

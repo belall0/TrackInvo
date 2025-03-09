@@ -14,6 +14,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => (
   <html lang="en">
     <body className={`${inter.className} antialiased`}>
       {children}
+
       <ToastContainer />
     </body>
   </html>
