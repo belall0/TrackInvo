@@ -3,6 +3,11 @@
 import cuid from 'cuid';
 import { Decimal } from '@prisma/client/runtime/library';
 
+enum InvoiceStatus {
+  paid = 'paid',
+  pending = 'pending',
+}
+
 const maleNames = [
   'Mohamed',
   'Ahmed',
