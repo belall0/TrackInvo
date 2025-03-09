@@ -232,7 +232,7 @@ export const columns: ColumnDef<Customer>[] = [
               <span>View customer</span>
             </DropdownMenuItem>
 
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/dashboard/customers/${customer.id}/edit`)}>
               <LuPencil />
               <span>Edit customer</span>
             </DropdownMenuItem>

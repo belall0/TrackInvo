@@ -61,3 +61,14 @@ export const getCustomerByEmail = async (userId: string, email: string) => {
 
   return customer;
 };
+
+export const getCustomerById = async (userId: string, customerId: string) => {
+  const customer = await db.customer.findFirst({
+    where: {
+      userId,
+      id: customerId,
+    },
+  });
+
+  return customer;
+};

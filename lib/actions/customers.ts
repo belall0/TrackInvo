@@ -5,7 +5,7 @@ import db from '@/lib/db/prisma';
 
 import { createResponse } from '@/lib/utils';
 import { CreateCustomerValues } from '@/lib/types/customers';
-import { createCustomerSchema } from '@/lib/schemas/customers';
+import { createCustomerSchema, editCustomerSchema } from '@/lib/schemas/customers';
 import { getCustomerByEmail } from '@/lib/db/customers';
 
 export const createCustomerAction = async (prevState: any, data: FormData | CreateCustomerValues) => {
@@ -49,6 +49,73 @@ export const createCustomerAction = async (prevState: any, data: FormData | Crea
   return createResponse({
     success: true,
     message: 'Customer created successfully',
+  });
+};
+
+export const editCustomerAction = async (prevState: any, data: FormData) => {
+  // 1. Authenticate the user
+  const session = await auth();
+
+  // 2. Validate the form data
+  let validatedFields;
+  if (data instanceof FormData) {
+    validatedFields = editCustomerSchema.safeParse({
+      customerId: data.get('customerId'),
+      name: data.get('name'),
+      email: data.get('email'),
+      phone: data.get('phone'),
+    });
+  } else {
+    validatedFields = editCustomerSchema.safeParse(data);
+  }
+
+  if (!validatedFields.success) {
+    return createResponse({
+      success: false,
+      message: 'Invalid fields. Please check your input.',
+    });
+  }
+
+  // 3. Make sure the user owns the customer
+  const customer = await db.customer.findUnique({
+    where: {
+      id: validatedFields.data.customerId,
+      userId: session?.user?.id,
+    },
+  });
+
+  if (!customer) {
+    return createResponse({
+      success: false,
+      message: 'Customer not found',
+    });
+  }
+
+  // 4. make sure the email isn't already taken
+  const existingCustomer = await getCustomerByEmail(session?.user?.id!, validatedFields.data.email);
+  if (existingCustomer.length > 0) {
+    return createResponse({
+      success: false,
+      message: 'A customer with this email already exists',
+    });
+  }
+
+  // 5. Update the customer data
+  await db.customer.update({
+    where: {
+      id: validatedFields.data.customerId,
+    },
+    data: {
+      name: validatedFields.data.name,
+      email: validatedFields.data.email,
+      phone: validatedFields.data.phone,
+    },
+  });
+
+  // 6. Return the response
+  return createResponse({
+    success: true,
+    message: 'Customer updated successfully',
   });
 };
 
