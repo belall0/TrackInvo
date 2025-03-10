@@ -4,6 +4,8 @@ import { signOut } from '@/auth/auth';
 import { LuHouse } from 'react-icons/lu';
 import { HiOutlineUsers } from 'react-icons/hi2';
 import { CiPower } from 'react-icons/ci';
+import { GrGroup } from 'react-icons/gr';
+import { CiReceipt } from 'react-icons/ci';
 
 import {
   Sidebar,
@@ -24,7 +26,8 @@ const items = [
     url: '/dashboard',
     icon: LuHouse,
   },
-  { title: 'Customers', url: '/dashboard/customers', icon: HiOutlineUsers },
+  { title: 'Customers', url: '/dashboard/customers', icon: GrGroup },
+  { title: 'Invoices', url: '/dashboard/invoices', icon: CiReceipt },
 ];
 
 const AppSidebar = () => {
