@@ -72,3 +72,17 @@ export const getCustomerById = async (userId: string, customerId: string) => {
 
   return customer;
 };
+
+export const getCustomerData = async (userId: string, customerId: string) => {
+  const customers = await db.customer.findUnique({
+    where: {
+      id: customerId,
+      userId,
+    },
+    include: {
+      invoices: true,
+    },
+  });
+
+  return customers;
+};

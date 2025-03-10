@@ -59,8 +59,14 @@ export const columns: ColumnDef<Customer>[] = [
       );
     },
     cell: ({ row }) => {
+      const router = useRouter();
       return (
-        <div className="flex items-center gap-3">
+        <Button
+          variant={'normal'}
+          className="flex items-center gap-3"
+          onClick={() => {
+            router.push(`/dashboard/customers/${row.original.id}`);
+          }}>
           <Image
             src={row.original.image}
             className="rounded-full"
@@ -69,7 +75,7 @@ export const columns: ColumnDef<Customer>[] = [
             height={28}
           />
           <p>{row.original.name}</p>
-        </div>
+        </Button>
       );
     },
   },
