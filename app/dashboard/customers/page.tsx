@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { auth } from '@/auth/auth';
 
 import { fetchCustomers } from '@/lib/db/customers';
@@ -14,15 +15,16 @@ const Customers = async (props: CustomersProps) => {
   const searchParams = await props.searchParams;
   const search = searchParams?.search || '';
   const session = await auth();
+  if (!session?.user?.id) redirect('/auth/login');
 
-  const data = await fetchCustomers(session?.user?.id!, search);
+  const data = await fetchCustomers(session.user.id, search);
 
   return (
     <div className="container mx-auto py-10">
       <div className="mb-6">
         <h1 className="mb-2 text-3xl font-bold">Customers</h1>
         <p className="text-gray-600">
-          Here's a list of all of your customers. You can do a lot of things with this data, try it out!
+          Here&apos;s a list of all of your customers. You can do a lot of things with this data, try it out!
         </p>
       </div>
 

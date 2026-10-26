@@ -8,7 +8,7 @@ import { createUser, getUserByEmail } from '@/lib/db/auth';
 import { signIn } from '@/auth/auth';
 import { DEFAULT_LOGIN_REDIRECT } from '@/auth/routes';
 
-export const signup = async (prevState: any, data: FormData | SignupFormData) => {
+export const signup = async (prevState: unknown, data: FormData | SignupFormData) => {
   // 1. Validate the form data
   let validatedFields;
   if (data instanceof FormData) {
@@ -16,6 +16,7 @@ export const signup = async (prevState: any, data: FormData | SignupFormData) =>
       name: data.get('name'),
       email: data.get('email'),
       password: data.get('password'),
+      confirmPassword: data.get('confirmPassword'),
     });
   } else {
     validatedFields = signupSchema.safeParse(data);
@@ -51,7 +52,7 @@ export const signup = async (prevState: any, data: FormData | SignupFormData) =>
     });
 
     // redirect to the login page
-  } catch (error) {
+  } catch {
     return createResponse({
       success: false,
       message: 'An unexpected error occurred during signup, please try again',
@@ -59,7 +60,7 @@ export const signup = async (prevState: any, data: FormData | SignupFormData) =>
   }
 };
 
-export const login = async (prevState: any, data: FormData | LoginFormData) => {
+export const login = async (prevState: unknown, data: FormData | LoginFormData) => {
   // 1. Validate the form data
   let validatedFields;
   if (data instanceof FormData) {

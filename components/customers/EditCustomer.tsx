@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -77,9 +76,9 @@ const CreateCustomerForm = ({ defaultValues }: UpdateCustomerProps) => {
       // Handle error case if needed
       toast.error(data.message);
     }
-  }, [data]);
+  }, [data, router]);
 
-  const onSubmit = (values: CreateCustomerValues) => {
+  const onSubmit = (values: EditCustomerValues) => {
     startTransition(() => {
       action(values);
     });

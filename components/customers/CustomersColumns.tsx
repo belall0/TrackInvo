@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useActionState, useEffect, useTransition } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, StockFeatures } from '@tanstack/react-table';
 import { toast } from 'react-toastify';
 
 import { deleteCustomerAction } from '@/lib/actions/customers';
@@ -37,8 +37,8 @@ export type Customer = {
   id: string;
   name: string;
   email: string;
-  phone: string;
-  image: string;
+  phone: string | null;
+  image: string | null;
   total_invoices: number;
   paid_invoices: number;
   pending_invoices: number;
@@ -47,7 +47,7 @@ export type Customer = {
   total_revenue: number;
 };
 
-export const columns: ColumnDef<Customer>[] = [
+export const columns: ColumnDef<StockFeatures, Customer>[] = [
   {
     accessorKey: 'name',
     header: ({ column }) => {
@@ -58,7 +58,7 @@ export const columns: ColumnDef<Customer>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
+    cell: function CustomerNameCell({ row }) {
       const router = useRouter();
       return (
         <Button
@@ -68,7 +68,7 @@ export const columns: ColumnDef<Customer>[] = [
             router.push(`/dashboard/customers/${row.original.id}`);
           }}>
           <Image
-            src={row.original.image}
+            src={row.original.image || '/avatars/male1.png'}
             className="rounded-full"
             alt={`${row.original.name}'s profile picture`}
             width={28}
@@ -188,8 +188,8 @@ export const columns: ColumnDef<Customer>[] = [
 
   {
     id: 'actions',
-    cell: ({ row }) => {
-      const [isPending, startTransition] = useTransition();
+    cell: function ActionsCell({ row }) {
+      const [, startTransition] = useTransition();
       const [data, action] = useActionState(deleteCustomerAction, undefined);
       const router = useRouter();
       const customer = row.original;
@@ -202,11 +202,10 @@ export const columns: ColumnDef<Customer>[] = [
         } else if (data?.success === false) {
           toast.error(data.message);
         }
-      }, [data]);
+      }, [data, router]);
 
       // Prepare delete handler
       const handleDelete = () => {
-        console.log(`handle`);
         const formData = new FormData();
         formData.append('customerId', customer.id);
 

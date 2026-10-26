@@ -1,22 +1,20 @@
-// @ts-nocheck
+import { redirect } from 'next/navigation';
 import { auth } from '@/auth/auth';
 
 import { getCustomerData } from '@/lib/db/customers';
 import CustomerInfo from '@/components/customers/CustomerInfo';
-import { cn, formatCurrency, formatDate } from '@/lib/utils';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDate } from '@/lib/utils';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import CustomerStats from '@/components/customers/CustomerStats';
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import CustomerInvoiceTable from '@/components/customers/CustomerInvoiceTable';
 
 const page = async ({ params }: { params: Promise<{ id: string }> }) => {
   const customerId = (await params).id;
   const session = await auth();
-  const customer: CustomerProfileData = await getCustomerData(session?.user?.id!, customerId);
+  if (!session?.user?.id) redirect('/auth/login');
+  const customer = await getCustomerData(session.user.id, customerId);
 
   if (!customer) {
     return <div>Customer not found</div>;

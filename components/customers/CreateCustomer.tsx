@@ -66,10 +66,9 @@ const CreateCustomerForm = () => {
       // Handle error case if needed
       toast.error(data.message);
     }
-  }, [data]);
+  }, [data, router]);
 
   const onSubmit = (values: CreateCustomerValues) => {
-    console.log(values);
     startTransition(() => {
       action(values);
     });

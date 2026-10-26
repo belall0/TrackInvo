@@ -1,12 +1,5 @@
-// @ts-nocheck
-
-import cuid from 'cuid';
-import { Decimal } from '@prisma/client/runtime/library';
-
-enum InvoiceStatus {
-  paid = 'paid',
-  pending = 'pending',
-}
+import { randomUUID } from 'node:crypto';
+import { Prisma, InvoiceStatus, type Customer, type Invoice, type User } from '@/lib/generated/prisma/client';
 
 const maleNames = [
   'Mohamed',
@@ -118,8 +111,8 @@ const generateRandomPhoneNumber = () => {
   return randomPrefix + restOfNumber;
 };
 
-const generateRevenues = (users) => {
-  const revenues = [];
+const generateRevenues = (users: User[]) => {
+  const revenues: Prisma.RevenueCreateManyInput[] = [];
 
   users.forEach((user) => {
     for (let month = 1; month <= 12; month++) {
@@ -135,7 +128,7 @@ const generateRevenues = (users) => {
       const year = month < 12 ? 2024 : 2025;
 
       revenues.push({
-        id: cuid(),
+        id: randomUUID(),
         userId: user.id,
         month,
         year: 2024,
@@ -150,7 +143,7 @@ const generateRevenues = (users) => {
 };
 
 const generateCustomers = () => {
-  let customers = [];
+  const customers: Customer[] = [];
 
   users.forEach((user) => {
     for (let i = 0; i < 20; i++) {
@@ -158,8 +151,8 @@ const generateCustomers = () => {
       const gender = Math.random() > 0.5 ? 'male' : 'female';
       const imageIndex = Math.floor(Math.random() * 5) + 1;
 
-      // 1. Generate a random id using cuid
-      const id = cuid();
+      // 1. Generate a random id
+      const id = randomUUID();
 
       // 2. set the user id
       const userId = user.id;
@@ -199,16 +192,16 @@ const generateCustomers = () => {
   return customers;
 };
 
-const generateInvoices = (customers) => {
-  let invoices: Invoice[] = [];
+const generateInvoices = (customers: Customer[]) => {
+  const invoices: Invoice[] = [];
 
   customers.forEach((customer) => {
     const numberOfInvoices = Math.floor(1 + Math.random() * 10);
     for (let i = 0; i < numberOfInvoices; i++) {
-      const id = cuid();
+      const id = randomUUID();
       const userId = customer.userId;
       const customerId = customer.id;
-      const amount = new Decimal(Math.floor(1000 + Math.random() * 900));
+      const amount = new Prisma.Decimal(Math.floor(1000 + Math.random() * 900));
       const status = Math.random() > 0.5 ? InvoiceStatus.paid : InvoiceStatus.pending;
 
       const invoice: Invoice = {
@@ -231,7 +224,7 @@ const generateInvoices = (customers) => {
 // DATA
 const users = [
   {
-    id: cuid(),
+    id: randomUUID(),
     name: 'Belal Muhammad',
     email: 'belallmuhammad0@gmail.com',
     passwordHash: '$2a$12$Ybtft/v4kqI7UtYN1hYceul3xbXfZuPGTGaYU22H30ss7EIQwMQ5u', // password123
@@ -240,7 +233,7 @@ const users = [
     updatedAt: new Date(),
   },
   {
-    id: cuid(),
+    id: randomUUID(),
     name: 'Ahmed Mahmoud',
     email: 'ahmed@example.com',
     passwordHash: '$2a$12$Ybtft/v4kqI7UtYN1hYceul3xbXfZuPGTGaYU22H30ss7EIQwMQ5u', // password123
@@ -249,7 +242,7 @@ const users = [
     updatedAt: new Date(),
   },
   {
-    id: cuid(),
+    id: randomUUID(),
     name: 'Rahma Ahmed',
     email: 'rahma@example.com',
     passwordHash: '$2a$12$Ybtft/v4kqI7UtYN1hYceul3xbXfZuPGTGaYU22H30ss7EIQwMQ5u', // password123

@@ -55,7 +55,7 @@ export const fetchTotalPendingAmountByUserId = async (userId: string) => {
 };
 
 export const fetchLatestInvoicesByUserId = async (userId: string) => {
-  let invoices = await db.invoice.findMany({
+  const invoices = await db.invoice.findMany({
     where: {
       userId,
     },

@@ -4,12 +4,15 @@ import { auth } from '@/auth/auth';
 import db from '@/lib/db/prisma';
 
 import { createResponse } from '@/lib/utils';
-import { CreateCustomerValues } from '@/lib/types/customers';
+import { CreateCustomerValues, EditCustomerValues } from '@/lib/types/customers';
 import { createCustomerSchema, editCustomerSchema } from '@/lib/schemas/customers';
 import { getCustomerByEmail } from '@/lib/db/customers';
 
-export const createCustomerAction = async (prevState: any, data: FormData | CreateCustomerValues) => {
+export const createCustomerAction = async (prevState: unknown, data: FormData | CreateCustomerValues) => {
   const session = await auth();
+  if (!session?.user?.id) {
+    return createResponse({ success: false, message: 'You are not authorized to perform this action' });
+  }
 
   let validatedFields;
   if (data instanceof FormData) {
@@ -30,7 +33,7 @@ export const createCustomerAction = async (prevState: any, data: FormData | Crea
   }
 
   const customerData: CreateCustomerValues = validatedFields.data;
-  const customer = await getCustomerByEmail(session?.user?.id!, customerData.email);
+  const customer = await getCustomerByEmail(session.user.id, customerData.email);
   if (customer.length > 0) {
     return createResponse({
       success: false,
@@ -41,7 +44,7 @@ export const createCustomerAction = async (prevState: any, data: FormData | Crea
   await db.customer.create({
     data: {
       ...customerData,
-      userId: session?.user?.id!,
+      userId: session.user.id,
       image: '/avatars/male1.png', // TODO: randomize the avatar
     },
   });
@@ -52,9 +55,13 @@ export const createCustomerAction = async (prevState: any, data: FormData | Crea
   });
 };
 
-export const editCustomerAction = async (prevState: any, data: FormData) => {
+export const editCustomerAction = async (prevState: unknown, data: FormData | EditCustomerValues) => {
   // 1. Authenticate the user
   const session = await auth();
+  // Never let a missing user ID remove Prisma's ownership filter.
+  if (!session?.user?.id) {
+    return createResponse({ success: false, message: 'You are not authorized to perform this action' });
+  }
 
   // 2. Validate the form data
   let validatedFields;
@@ -80,7 +87,7 @@ export const editCustomerAction = async (prevState: any, data: FormData) => {
   const customer = await db.customer.findUnique({
     where: {
       id: validatedFields.data.customerId,
-      userId: session?.user?.id,
+      userId: session.user.id,
     },
   });
 
@@ -92,8 +99,8 @@ export const editCustomerAction = async (prevState: any, data: FormData) => {
   }
 
   // 4. make sure the email isn't already taken
-  const existingCustomer = await getCustomerByEmail(session?.user?.id!, validatedFields.data.email);
-  if (existingCustomer.length > 0) {
+  const existingCustomer = await getCustomerByEmail(session.user.id, validatedFields.data.email);
+  if (existingCustomer.some((existing) => existing.id !== customer.id)) {
     return createResponse({
       success: false,
       message: 'A customer with this email already exists',
@@ -104,6 +111,7 @@ export const editCustomerAction = async (prevState: any, data: FormData) => {
   await db.customer.update({
     where: {
       id: validatedFields.data.customerId,
+      userId: session.user.id,
     },
     data: {
       name: validatedFields.data.name,
@@ -119,13 +127,20 @@ export const editCustomerAction = async (prevState: any, data: FormData) => {
   });
 };
 
-export const deleteCustomerAction = async (prevState: any, data: FormData) => {
+export const deleteCustomerAction = async (prevState: unknown, data: FormData) => {
   const session = await auth();
-  const customerId = data.get('customerId') as string;
+  if (!session?.user?.id) {
+    return createResponse({ success: false, message: 'You are not authorized to perform this action' });
+  }
+  const customerId = data.get('customerId');
+  if (typeof customerId !== 'string' || !customerId) {
+    return createResponse({ success: false, message: 'Invalid customer ID' });
+  }
 
   const customer = await db.customer.findUnique({
     where: {
       id: customerId,
+      userId: session.user.id,
     },
   });
 
@@ -146,6 +161,7 @@ export const deleteCustomerAction = async (prevState: any, data: FormData) => {
   await db.customer.delete({
     where: {
       id: customerId,
+      userId: session.user.id,
     },
   });
 

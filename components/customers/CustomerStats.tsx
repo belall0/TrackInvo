@@ -1,8 +1,8 @@
-// @ts-nocheck
+import type { CustomerProfileData } from '@/lib/types/customers';
 
 import React from 'react';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const CustomerStats = ({ customer }: { customer: CustomerProfileData }) => {
   const totalInvoices = customer.invoices.length;

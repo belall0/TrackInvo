@@ -1,10 +1,7 @@
-import authConfig from '@/auth/auth.config';
-import NextAuth from 'next-auth';
+import { auth } from '@/auth/auth';
 import { DEFAULT_LOGIN_REDIRECT, apiAuthPrefix, authRoutes, publicRoutes } from '@/auth/routes';
 
-const { auth } = NextAuth(authConfig);
-
-// this middleware will be executed for every request
+// this proxy will be executed for every request
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;

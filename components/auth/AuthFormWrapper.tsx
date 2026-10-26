@@ -28,7 +28,7 @@ const AuthFormWrapper = ({ children, formTitle, formDescription, formType }: Aut
 
         {formType === 'login' ? (
           <div className="flex items-center justify-center gap-2">
-            <span className="text-muted-foreground"> Don't have an account?</span>
+            <span className="text-muted-foreground"> Don&apos;t have an account?</span>
             <Link href="/auth/signup">
               <span className="text-blue-600">Sign up</span>
             </Link>
@@ -45,9 +45,9 @@ const AuthFormWrapper = ({ children, formTitle, formDescription, formType }: Aut
 
       <CardFooter className="flex flex-col items-center justify-center gap-y-2">
         <div className="my-1 flex w-full items-center">
-          <div className="flex-grow border-t border-gray-300"></div>
-          <span className="px-4 text-sm uppercase text-gray-500">or</span>
-          <div className="flex-grow border-t border-gray-300"></div>
+          <div className="grow border-t border-gray-300"></div>
+          <span className="px-4 text-sm text-gray-500 uppercase">or</span>
+          <div className="grow border-t border-gray-300"></div>
         </div>
         <div className="flex w-full items-center justify-center gap-x-2">
           <Button size={'lg'} className="w-full" variant={'outline'}>

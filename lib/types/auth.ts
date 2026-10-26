@@ -5,7 +5,7 @@ import { z } from 'zod';
 export type LoginFormData = z.infer<typeof loginSchema>;
 export type SignupFormData = z.infer<typeof signupSchema>;
 
-export interface Response<T = any> {
+export interface Response<T = unknown> {
   success: boolean;
   message?: string;
   data?: T;

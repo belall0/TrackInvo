@@ -10,14 +10,13 @@ import { CiSearch } from 'react-icons/ci';
 
 import {
   ColumnDef,
+  StockFeatures,
   SortingState,
-  VisibilityState,
+  ColumnVisibilityState,
+  RowData,
   flexRender,
-  getFilteredRowModel,
-  getCoreRowModel,
-  getSortedRowModel,
-  getPaginationRowModel,
-  useReactTable,
+  useTable,
+  stockFeatures,
 } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
@@ -29,11 +28,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<TData extends RowData> {
+  columns: ColumnDef<StockFeatures, TData>[];
   data: TData[];
 }
-const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValue>) => {
+const DataTable = <TData extends RowData>({ columns, data }: DataTableProps<TData>) => {
   // for handling search
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -41,7 +40,7 @@ const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValu
 
   // for handling table state
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+  const [columnVisibility, setColumnVisibility] = React.useState<ColumnVisibilityState>({
     // to mark some columns as invisible by default
     phone: false,
     paid_invoices: false,
@@ -49,16 +48,13 @@ const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValu
   });
 
   // create a table instance
-  const table = useReactTable({
+  const table = useTable({
+    features: stockFeatures,
     data,
     columns,
 
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    getPaginationRowModel: getPaginationRowModel(),
 
     initialState: {
       pagination: {
@@ -89,7 +85,7 @@ const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValu
     <div>
       <div className="flex items-center gap-x-4 py-4">
         {/* Search bar */}
-        <div className="relative flex flex-1 flex-shrink-0">
+        <div className="relative flex flex-1 shrink-0">
           <Input
             placeholder="Search by name, email, or phone..."
             defaultValue={searchParams.get('search')?.toString()}
@@ -172,7 +168,7 @@ const DataTable = <TData, TValue>({ columns, data }: DataTableProps<TData, TValu
       {/* Paginaiton Controllers */}
       <div className="mt-4 flex items-center justify-center space-x-2 py-4">
         <p className="text-sm text-gray-600">
-          Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+          Page {table.state.pagination.pageIndex + 1} of {table.getPageCount()}
         </p>
 
         <Button variant="outline" size="lg" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>

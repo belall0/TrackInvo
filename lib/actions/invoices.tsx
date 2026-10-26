@@ -4,20 +4,24 @@ import db from '@/lib/db/prisma';
 import { createResponse } from '@/lib/utils';
 import { deleteInvoiceById } from '../db/invoices';
 
-export const deleteInvoiceAction = async (prevState: any, data: FormData) => {
+export const deleteInvoiceAction = async (prevState: unknown, data: FormData) => {
   // 1. Authenticate the user
   const session = await auth();
-  if (!session) {
+  if (!session?.user?.id) {
     return createResponse({
       success: false,
       message: 'You are not authorized to perform this action',
     });
   }
   // 3. get the invoice
-  const invoiceId = data.get('invoiceId') as string;
+  const invoiceId = data.get('invoiceId');
+  if (typeof invoiceId !== 'string' || !invoiceId) {
+    return createResponse({ success: false, message: 'Invalid invoice ID' });
+  }
   const invoice = await db.invoice.findUnique({
     where: {
       id: invoiceId,
+      userId: session.user.id,
     },
   });
   if (!invoice) {
@@ -36,7 +40,7 @@ export const deleteInvoiceAction = async (prevState: any, data: FormData) => {
   }
 
   // 4. delete the invoice
-  await deleteInvoiceById(invoiceId);
+  await deleteInvoiceById(session.user.id, invoiceId);
   // 5. return the response
   return createResponse({
     success: true,

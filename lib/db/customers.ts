@@ -1,8 +1,18 @@
-// @ts-nocheck
 import db from '@/lib/db/prisma';
+import type { Customer } from '@/components/customers/CustomersColumns';
+import type { Prisma } from '@/lib/generated/prisma/client';
 
-export const fetchCustomers = async (userId: string, search: string): Promise<any[]> => {
-  const customers = await db.$queryRaw`
+type CustomerRow = Omit<Customer, 'total_invoices' | 'paid_invoices' | 'pending_invoices' | 'total_paid' | 'total_pending' | 'total_revenue'> & {
+  total_invoices: bigint;
+  paid_invoices: bigint;
+  pending_invoices: bigint;
+  total_paid: Prisma.Decimal | null;
+  total_pending: Prisma.Decimal | null;
+  total_revenue: Prisma.Decimal | null;
+};
+
+export const fetchCustomers = async (userId: string, search: string): Promise<Customer[]> => {
+  const customers = await db.$queryRaw<CustomerRow[]>`
     SELECT customers.id,
           customers.name,
           customers.email,

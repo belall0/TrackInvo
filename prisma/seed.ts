@@ -1,5 +1,5 @@
 import db from '@/lib/db/prisma';
-import { Prisma } from '@prisma/client';
+import type { Prisma } from '@/lib/generated/prisma/client';
 import { users, customers, invoices, revenues } from '@/lib/db/seed-data';
 
 const seedUsers = async (users: Prisma.UserCreateManyInput[]) => {
@@ -40,4 +40,9 @@ const seed = async () => {
   await seedRevenues(revenues);
 };
 
-seed();
+seed()
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(() => db.$disconnect());

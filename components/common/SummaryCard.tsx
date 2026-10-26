@@ -5,7 +5,7 @@ interface SummaryCardProps {
 }
 const SummaryCard = ({ Icon, title, value }: SummaryCardProps) => {
   return (
-    <div className="rounded-xl bg-gray-50 p-2 shadow-sm">
+    <div className="rounded-xl bg-gray-50 p-2 shadow-xs">
       <div className="flex p-4">
         {/* check if Icon is exist to prevent component crash */}
         {Icon && <Icon className="size-5 text-gray-700" />}

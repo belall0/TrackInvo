@@ -36,10 +36,11 @@ export const fetchInvoicesByUserId = async (userId: string, search: string) => {
   return resultsWithRegularNumbers;
 };
 
-export const deleteInvoiceById = async (id: string) => {
+export const deleteInvoiceById = async (userId: string, id: string) => {
   await db.invoice.delete({
     where: {
       id,
+      userId,
     },
   });
 };

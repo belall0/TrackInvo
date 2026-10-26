@@ -44,7 +44,7 @@ const LatestInvoices = async ({ userId }: { userId: string }) => {
             })}
           </div>
         ) : (
-          <div className="flex flex-grow flex-col items-center justify-center">
+          <div className="flex grow flex-col items-center justify-center">
             <p className="text-sm text-gray-500">No invoices found</p>
           </div>
         )}

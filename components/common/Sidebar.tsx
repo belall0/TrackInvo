@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { signOut } from '@/auth/auth';
 
 import { LuHouse } from 'react-icons/lu';
-import { HiOutlineUsers } from 'react-icons/hi2';
 import { CiPower } from 'react-icons/ci';
 import { GrGroup } from 'react-icons/gr';
 import { CiReceipt } from 'react-icons/ci';

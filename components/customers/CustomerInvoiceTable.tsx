@@ -1,9 +1,9 @@
-// @ts-nocheck
+import type { Invoice } from '@/lib/generated/prisma/client';
 import { cn, formatCurrency, formatDate } from '@/lib/utils';
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 
-const CustomerInvoiceTable = ({ invoices }) => {
+const CustomerInvoiceTable = ({ invoices }: { invoices: Invoice[] }) => {
   return (
     <div className="rounded-md border">
       <Table>
@@ -21,7 +21,7 @@ const CustomerInvoiceTable = ({ invoices }) => {
             <TableRow key={invoice.id}>
               <TableCell className="font-medium">{invoice.id}</TableCell>
               <TableCell>{formatDate(invoice.createdAt)}</TableCell>
-              <TableCell>{formatCurrency(invoice.amount)}</TableCell>
+              <TableCell>{formatCurrency(Number(invoice.amount))}</TableCell>
               <TableCell>
                 <Badge
                   className={cn(

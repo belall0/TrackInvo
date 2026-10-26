@@ -3,21 +3,20 @@
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useActionState, useEffect, useTransition } from 'react';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, StockFeatures } from '@tanstack/react-table';
 import { toast } from 'react-toastify';
 
 import { deleteInvoiceAction } from '@/lib/actions/invoices';
 import { cn, formatCurrency, formatDate, formatDateToLocal } from '@/lib/utils';
 
 import { FiMoreHorizontal } from 'react-icons/fi';
-import { LuCopy, LuPencil, LuTrash, LuEye, LuArrowUpDown } from 'react-icons/lu';
+import { LuPencil, LuTrash, LuEye, LuArrowUpDown } from 'react-icons/lu';
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -34,27 +33,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
-export type Invoice = {
-  id: string;
-  userId: string;
-  customerId: string;
+export type Invoice = Omit<import('@/lib/generated/prisma/client').Invoice, 'amount'> & {
   amount: number;
-  status: string;
-  createdAt: Date;
-  updatedAt: Date;
-  customer: {
-    id: string;
-    userId: string;
-    name: string;
-    email: string;
-    phone?: string;
-    image: string;
-    createdAt: Date;
-    updatedAt: Date;
-  };
+  customer: import('@/lib/generated/prisma/client').Customer;
 };
 
-export const columns: ColumnDef<Invoice>[] = [
+export const columns: ColumnDef<StockFeatures, Invoice>[] = [
   {
     accessorKey: 'customer',
     header: ({ column }) => {
@@ -65,7 +49,7 @@ export const columns: ColumnDef<Invoice>[] = [
         </Button>
       );
     },
-    cell: ({ row }) => {
+    cell: function InvoiceCustomerCell({ row }) {
       const router = useRouter();
 
       return (
@@ -76,7 +60,7 @@ export const columns: ColumnDef<Invoice>[] = [
             router.push(`/dashboard/customers/${row.original.customer.id}`);
           }}>
           <Image
-            src={row.original.customer.image}
+            src={row.original.customer.image || '/avatars/male1.png'}
             className="rounded-full"
             alt={`${row.original.customer.name}'s profile picture`}
             width={28}
@@ -159,8 +143,8 @@ export const columns: ColumnDef<Invoice>[] = [
 
   {
     id: 'actions',
-    cell: ({ row }) => {
-      const [isPending, startTransition] = useTransition();
+    cell: function ActionsCell({ row }) {
+      const [, startTransition] = useTransition();
       const [data, action] = useActionState(deleteInvoiceAction, undefined);
       const router = useRouter();
       const invoice = row.original;
@@ -173,7 +157,7 @@ export const columns: ColumnDef<Invoice>[] = [
         } else if (data?.success === false) {
           toast.error(data.message);
         }
-      }, [data]);
+      }, [data, router]);
 
       // Prepare delete handler
       const handleDelete = () => {
